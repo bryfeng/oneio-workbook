@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ONE system map — Mark review</title>
+<meta name="description" content="ONE service map reconstructed from shared architecture documents, with proposed extension points and follow-up items.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23232e27'/%3E%3Cpath d='M22 9a9 9 0 1 0 0 14' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="system.css">
+</head>
+<body>
+<a class="skip-link" href="#service-map">Skip to service map</a>
+<main class="system-document">
+  <header class="masthead">
+    <div><div class="eyebrow">CLEARER / ONE</div><h1>ONE system map</h1><p class="subtitle">The services ONE has documented and where we can build on them.</p></div>
+    <div class="edition"><span>Review draft</span><a href="./">API brief ↗</a><a href="visuals.html">Visual overview ↗</a><a href="walkthrough.html">API walkthrough ↗</a></div>
+  </header>
+  <nav class="view-tabs" aria-label="System map sections">
+    <a href="#service-map"><span class="nav-number">01</span>Service map</a>
+    <a href="#extensions"><span class="nav-number">02</span>Where we extend</a>
+    <a href="#mark-review"><span class="nav-number">03</span>Follow-up items</a>
+  </nav>
+
+  <section id="service-map" class="system-section" aria-labelledby="map-title">
+    <div class="section-heading"><span class="section-number">01</span><div><h2 id="map-title">How ONE is set up</h2><p>We’ve brought ONE’s two diagrams together here so we can confirm the live services and their connections with Mark.</p></div><span class="map-tag">From shared docs</span></div>
+    <figure class="service-map" aria-labelledby="map-title map-caption">
+      <div class="map-layer"><div class="layer-label">Access</div><div class="layer-content"><strong>Payments · Trading · Gateway · FX · Admin UI</strong><span>Open API · authentication · customer and user management</span></div></div>
+      <div class="map-connector" aria-hidden="true">↓</div>
+      <div class="map-layer"><div class="layer-label">Orchestration<br>& controls</div><div class="layer-content"><strong>Orchestration · routing · validation · approvals</strong><span>AML / compliance · transaction monitoring · pricing · fees · beneficiaries</span></div></div>
+      <div class="map-connector" aria-hidden="true">↓</div>
+      <div class="map-layer core-layer"><div class="layer-label">Core services</div><div class="layer-content">
+        <div class="state-pair"><div><strong>Wallet service</strong><span>Virtual balance management <a href="#source-platform" aria-label="Platform overview source">[1]</a></span></div><div><strong>Core Registry / ledger</strong><span>Shown together in the architecture <a href="#source-architecture" aria-label="Architecture source">[2]</a></span></div></div>
+        <p class="open-boundary">To confirm: how these relate and which one holds the balance</p>
+        <div class="core-domains"><strong>Payments</strong><strong>FX</strong><strong>Trading</strong><strong>Reconciliation</strong><strong>Global disbursements</strong></div>
+        <span>Treasury · safeguarding · IBAN issuing</span>
+      </div></div>
+      <div class="map-connector" aria-hidden="true">↓</div>
+      <div class="map-layer"><div class="layer-label">Integrations</div><div class="layer-content integration-columns"><div><strong>Fireblocks</strong><span>Custody & transactions</span></div><div><strong>Talos</strong><span>Digital asset trading</span></div><div><strong>Bank / FX adapters</strong><span>Accounts, exchange & payments</span></div><div><strong>Compliance providers</strong><span>Hawk · Elliptic · Notabene</span></div></div></div>
+      <div class="map-crosscut"><strong>Across the platform</strong><span>Configuration · logging & audit · reporting · monitoring · back office</span></div>
+      <figcaption id="map-caption">The arrows follow the March overview’s layers [1], with services and providers drawn from both diagrams [1, 2]; Mark still needs to confirm the actual calls between them.</figcaption>
+    </figure>
+    <details class="source-detail">
+      <summary>The documents we’re working from</summary>
+      <ol class="source-list">
+        <li id="source-platform"><a href="https://drive.google.com/file/d/14SgjcNziHky9V6Dy4snnyO6GVPZb4On8/view">Platform overview — March 2026 ↗</a><p>This shows how the wallet, payments, FX, trading and reconciliation services sit between orchestration and the external providers.</p></li>
+        <li id="source-architecture"><a href="https://drive.google.com/file/d/145DBzFLsvH1OgCpeosN9x56bCDC9C2mv/view">“Starter for 10” architecture ↗</a><p>This adds the Core Registry / ledger, routing, fees, treasury and controls, but does not tell us which services are running.</p></li>
+        <li><a href="https://drive.google.com/file/d/1aix_jxwhE00UucbZS5trtnl1mcUadvdf/view">Product roadmap — June 2026, Mark Price ↗</a><p>Mark’s roadmap includes Core Registry work, though we need his update to understand what has shipped since June.</p></li>
+      </ol>
+      <p>All three shared files were last modified on 7 July, and our 21 September search of the shared folders and filenames did not surface a newer ONE system diagram.</p>
+    </details>
+  </section>
+
+  <section id="extensions" class="system-section" aria-labelledby="extensions-title">
+    <div class="section-heading"><span class="section-number">02</span><div><h2 id="extensions-title">Where we can build on this</h2><p>These are the services we would build around, with the proposed endpoints in the <a href="./#integration">API brief</a>.</p></div><span class="map-tag proposed">Proposed</span></div>
+    <div class="extension-list">
+      <div class="extension-row"><h3>Business wallets</h3><p><strong>Account / wallet services + Dynamic</strong><span>Give the business a shared wallet record that connects its team and signing permissions, with Gateway using it alongside other products.</span></p></div>
+      <div class="extension-row"><h3>Flow collection</h3><p><strong>Gateway + orchestration + Flow adapter</strong><span>Use Flow for the collection, then check that the funds reached the wallet the merchant selected.</span></p></div>
+      <div class="extension-row"><h3>Crypto batches</h3><p><strong>Payments / disbursements + custody or wallet signer</strong><span>Build on the dashboard’s batch handling if we can, adding crypto checks and tracking each recipient before retrying any payment.</span></p></div>
+      <div class="extension-row"><h3>Auto-conversion</h3><p><strong>Custody + trading + ledger + reconciliation</strong><span>Let the merchant agree the conversion instructions up front, then connect deposit checks, any sweep, the trade and fiat credit.</span></p></div>
+    </div>
+  </section>
+
+  <section id="mark-review" class="system-section" aria-labelledby="review-title">
+    <div class="section-heading"><span class="section-number">03</span><div><h2 id="review-title">Follow-up items</h2><p>We can work through these items together to decide which services to use directly and which parts to mock for the demo.</p></div></div>
+    <ol class="review-list">
+      <li><strong>Current services</strong><span>Review which services are live, who owns them and which APIs or events connect them, using a newer map if one is available.</span></li>
+      <li><strong>Accounts and balances</strong><span>Clarify how the wallet service connects to the registry and ledger, including the relationships between businesses, accounts, vaults and addresses.</span></li>
+      <li><strong>Batch payout workflow</strong><span>Walk through the dashboard’s batch service to see what we can reuse for crypto, including approvals, funding and retries.</span></li>
+      <li><strong>Crypto-to-fiat workflow</strong><span>Trace a deposit from arrival through screening, any sweep, trading and fiat credit, noting the events, manual steps and how failures are handled.</span></li>
+    </ol>
+  </section>
+  <footer><span>clearer.money</span><span>Source review · 21 September 2026</span></footer>
+</main>
+</body>
+</html>

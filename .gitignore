@@ -1,0 +1,9 @@
+# Build output and local review materials
+dist/
+screenshots/
+LOCAL-NOTES.md
+DESIGN.md
+.DS_Store
+.env
+.env.*
+node_modules/
