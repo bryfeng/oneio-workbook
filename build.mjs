@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { buildWalkthrough } from './build-walkthrough.mjs';
+import { buildFlow } from './build-flow.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, 'dist');
@@ -21,6 +22,8 @@ const standalone = html
   .replace('href="visuals.html"', 'href="one-visuals-draft.html"')
   .replace('href="system.html"', 'href="one-system-map.html"')
   .replace('href="walkthrough.html"', 'href="one-api-walkthrough.html"')
+  .replace('href="flow.html"', 'href="one-flow-delivery.html"')
+  .replaceAll('href="flow-experience.html"', 'href="one-flow-experience.html"')
   .replace('</body>', `<script>\n${script(data)}\n${script(app)}\n</script>\n</body>`);
 await writeFile(path.join(dist,'one-gateway-api-brief.html'), standalone);
 const [visualHtml, visualCss, visualJs] = await Promise.all(
@@ -34,6 +37,8 @@ const visualStandalone = visualHtml
   .replaceAll('href="./', 'href="one-gateway-api-brief.html')
   .replace('href="system.html"', 'href="one-system-map.html"')
   .replace('href="walkthrough.html"', 'href="one-api-walkthrough.html"')
+  .replace('href="flow.html"', 'href="one-flow-delivery.html"')
+  .replaceAll('href="flow-experience.html"', 'href="one-flow-experience.html"')
   .replace('</body>', `<script>\n${script(data)}\n${script(visualJs)}\n</script>\n</body>`);
 await writeFile(path.join(dist,'one-visuals-draft.html'), visualStandalone);
 const [systemHtml, systemCss] = await Promise.all(
@@ -44,7 +49,9 @@ const systemStandalone = systemHtml
   .replace('<link rel="stylesheet" href="system.css">', `<style>\n${systemCss}\n</style>`)
   .replaceAll('href="./', 'href="one-gateway-api-brief.html')
   .replace('href="visuals.html"', 'href="one-visuals-draft.html"')
-  .replace('href="walkthrough.html"', 'href="one-api-walkthrough.html"');
+  .replace('href="walkthrough.html"', 'href="one-api-walkthrough.html"')
+  .replace('href="flow.html"', 'href="one-flow-delivery.html"')
+  .replaceAll('href="flow-experience.html"', 'href="one-flow-experience.html"');
 await writeFile(path.join(dist,'one-system-map.html'), systemStandalone);
 // Refresh linked assets together when a local page changes.
 const revision = createHash('sha256').update(css + data + app + visualCss + visualJs + systemCss).digest('hex').slice(0,12);
@@ -52,4 +59,5 @@ for (const [name, markup] of [['index.html', html], ['visuals.html', visualHtml]
   await writeFile(path.join(dist,name), markup.replace(/(src|href)="([^"\s]+\.(?:css|js))"/g, `$1="$2?v=${revision}"`));
 }
 const walkthrough = await buildWalkthrough(root,dist);
-console.log(`Built the brief, visuals, system map and static walkthrough (${walkthrough.sections} sections, ${walkthrough.steps} steps), including standalone HTML and Markdown.`);
+await buildFlow(root,dist);
+console.log(`Built six workbook pages, including the static walkthrough (${walkthrough.sections} sections, ${walkthrough.steps} steps) and Flow delivery/API and collection specification pages, with standalone HTML and Markdown.`);

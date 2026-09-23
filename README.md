@@ -24,7 +24,11 @@ Requires Node.js 22 or later, with no package dependencies.
 node build.mjs
 ```
 
-Edit the files in `src/`. The build produces the four pages, standalone HTML exports and the Markdown walkthrough in `dist/`. `src/walkthrough-data.mjs` supplies the shared examples used by both the HTML walkthrough and Markdown handoff.
+Edit the files in `src/`. The build produces six pages, standalone HTML exports and Markdown handoffs in `dist/`. `src/walkthrough-data.mjs` supplies the shared examples used by both the HTML walkthrough and Markdown handoff.
+
+The `flow.html` page covers white-label Flow delivery options, creation parameters, checkout calls and the proposed timeline. Its reviewed sources are `src/flow-delivery.md` and `src/flow-api.md`; `build-flow.mjs` uses those same files for the HTML page and `one-flow-brief.md` download. The standalone export is `one-flow-delivery.html`.
+
+The collection product specification is `flow-experience.html`, linked from the Flow page. Its canonical source is `src/flow-experience.md`, covering the merchant and payer journey, connected API calls, example parameters, service responsibilities, status model and acceptance criteria. The same source produces `one-flow-experience.md` for the development team and `one-flow-experience.html` for standalone review. The live proof stops at Flow creation and receiving-address verification; later checkout and credit stages remain proposed or documented-but-untested.
 
 The standalone files can be opened without a server. Keep the HTML exports and Markdown download together for their companion links.
 
