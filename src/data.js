@@ -1,9 +1,8 @@
-/* Source snapshot: 20 September 2026. Proposed services are not live APIs. */
 window.SHORTLIST_DATA = {
-  "title": "ONE API extensions",
+  "title": "ONE Gateway V3",
   "eyebrow": "CLEARER / ONE",
-  "subtitle": "How we can build on ONE’s accounts, wallets and payment services.",
-  "updated": "20 September 2026",
+  "subtitle": "Flow inside ONE · a payment experience built on ONE’s existing settlement choices.",
+  "updated": "23 September 2026",
   "sections": [
     {
       "id": "inventory",
@@ -293,58 +292,58 @@ window.SHORTLIST_DATA = {
     {
       "id": "functionality",
       "number": "02",
-      "nav": "What we want",
-      "title": "What we want to enable",
-      "intro": "",
+      "nav": "V3 path",
+      "title": "V3 product path",
+      "intro": "Flow-powered checkout comes first. Shared business wallets and treasury workflows follow as separate platform work.",
       "columns": [
         "Capability",
         "What the merchant can do"
       ],
       "rows": [
         {
-          "id": "business-wallet",
-          "title": "Business wallets",
-          "summary": "Give the business a wallet with team access and spending controls.",
-          "status": "Proposed",
-          "tone": "neutral",
-          "blocks": [
-            {
-              "label": "Ownership",
-              "text": "The wallet belongs to the business as people join or leave, with checkout, payouts and treasury using the same ONE wallet reference."
-            },
-            {
-              "label": "Team controls",
-              "text": "The team can invite staff, change signing access and set spending policies, while account administration and wallet signing remain separate permissions."
-            },
-            {
-              "label": "Availability",
-              "text": "Dynamic Business Accounts and the policy helpers are in early access, with multi-person quorum approvals still listed as coming soon."
-            }
-          ]
-        },
-        {
           "id": "collection",
           "title": "Crypto collection",
-          "summary": "Let customers pay through checkout or a link, then confirm delivery.",
-          "status": "Proposed",
+          "summary": "Start with ONE-branded crypto checkout powered by Flow.",
+          "status": "SPARK first",
           "tone": "neutral",
           "blocks": [
             {
               "label": "Payment terms",
-              "text": "We set the amount, destination, asset and network up front, while the payer can use a supported external wallet."
+              "text": "The merchant’s active default settlement profile resolves to an eligible ONE custody account or verified self-custody wallet. The payer connects their own supported wallet after Flow creation."
             },
             {
               "label": "Receipt",
-              "text": "Each order should link to its Flow, source transaction and settlement transaction, along with the amounts and fees. We confirm delivery before marking it settled, because source confirmation alone does not prove the merchant received the funds. Any conversion and fiat credit would follow as separate steps after the crypto arrives."
+              "text": "Each request carries its Flow, source and destination evidence, amounts and fees. Custody settlement proceeds through ONE deposit and ledger credit; self-custody records an external-wallet receipt. Sandbox evidence proves address handoff and Flow readback, not payer payment or final receipt."
+            }
+          ]
+        },
+        {
+          "id": "business-wallet",
+          "title": "Business wallets",
+          "summary": "Add shared business wallets after the Flow path is established.",
+          "status": "Later phase",
+          "tone": "pending",
+          "blocks": [
+            {
+              "label": "Ownership",
+              "text": "ONE can later link a shared business wallet to the merchant and expose the same registered destination to checkout, payouts and treasury."
+            },
+            {
+              "label": "Team controls",
+              "text": "Member administration and wallet signing are separate permissions. Dynamic Business Accounts availability, recovery and signing controls need confirmation before implementation."
+            },
+            {
+              "label": "Timing",
+              "text": "Later phase. Dynamic Business Accounts are an optional wallet layer; Flow checkout can use existing custody or verified self-custody destinations first."
             }
           ]
         },
         {
           "id": "money-out",
           "title": "Crypto payouts",
-          "summary": "Send one payment or a batch, issue refunds and track each recipient.",
-          "status": "Proposed",
-          "tone": "neutral",
+          "summary": "Add crypto payout batches and related treasury workflows later.",
+          "status": "Later phase",
+          "tone": "pending",
           "blocks": [
             {
               "label": "Payments and refunds",
@@ -402,90 +401,15 @@ window.SHORTLIST_DATA = {
     {
       "id": "providers",
       "number": "03",
-      "nav": "Dynamic & Flow",
+      "nav": "Providers",
       "title": "What Dynamic & Flow provide",
-      "intro": "",
+      "intro": "Dynamic’s Flow environment is needed for Flow payments. Embedded business wallets are optional and can follow later.",
       "columns": [
         "Provider",
         "What we can use",
         "Availability"
       ],
       "rows": [
-        {
-          "id": "dynamic",
-          "title": "Dynamic",
-          "summary": "Business wallets, team access and signing policies.",
-          "status": "Early access",
-          "tone": "pending",
-          "groups": [
-            {
-              "id": "dynamic-account",
-              "title": "Wallets",
-              "summary": "A business account owns wallets, with members and wallet-specific signers.",
-              "status": "Early access",
-              "tone": "pending",
-              "operations": [
-                {
-                  "path": "createBusinessAccount / listBusinessAccounts / getBusinessAccount",
-                  "technical": "Create or read the team account. The creator becomes its owner."
-                },
-                {
-                  "path": "createWalletForBusinessAccount / addWalletToBusinessAccount",
-                  "technical": "Create a wallet or link an existing embedded wallet. The caller becomes its first signer."
-                }
-              ],
-              "note": "We can put Dynamic’s wallet methods behind ONE’s shared account experience, with Gateway using the same wallet record as other products. We still need to confirm early-access availability in ONE’s environment before depending on it."
-            },
-            {
-              "id": "dynamic-access",
-              "title": "Access & policies",
-              "summary": "Manage the team and constrain how authorised wallet signers act.",
-              "status": "Early access",
-              "tone": "pending",
-              "operations": [
-                {
-                  "path": "addBusinessAccountMember / updateBusinessAccountMemberRole / removeBusinessAccountMember",
-                  "technical": "Manage administrators and viewers; removing a member also removes their signer records."
-                },
-                {
-                  "path": "addBusinessAccountSigner / removeBusinessAccountSigner",
-                  "technical": "Grant or revoke wallet signing. Adding a signer needs owner/admin authority plus an active signer on that wallet."
-                },
-                {
-                  "path": "checkStepUpAuth + an authentication method",
-                  "technical": "Obtain fresh, action-scoped authentication for sensitive changes."
-                },
-                {
-                  "path": "createPolicy / getPolicy / removePolicyRules",
-                  "technical": "Apply account, wallet and signer rules. All applicable policy layers must pass."
-                }
-              ],
-              "note": "Account administration and wallet signing use separate permissions, with spending policies controlling what an authorised signer can do. Multi-person quorum approvals are still coming soon, so we should leave them out of the current capability claim."
-            }
-          ],
-          "sources": [
-            {
-              "label": "Business Accounts",
-              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/overview"
-            },
-            {
-              "label": "Create / link wallets",
-              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/add-wallets"
-            },
-            {
-              "label": "Wallet policies",
-              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/policies/overview"
-            },
-            {
-              "label": "Signer management",
-              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/manage-signers"
-            },
-            {
-              "label": "Quorum availability",
-              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/policies/quorum-policies"
-            }
-          ]
-        },
         {
           "id": "flow",
           "title": "Fireblocks Flow",
@@ -584,15 +508,90 @@ window.SHORTLIST_DATA = {
               "url": "https://www.dynamic.xyz/docs/overview/fireblocks-flow-api"
             }
           ]
+        },
+        {
+          "id": "dynamic",
+          "title": "Dynamic",
+          "summary": "Optional business wallet accounts, team access and signing policies for a later phase.",
+          "status": "Early access",
+          "tone": "pending",
+          "groups": [
+            {
+              "id": "dynamic-account",
+              "title": "Wallets",
+              "summary": "A business account owns wallets, with members and wallet-specific signers.",
+              "status": "Early access",
+              "tone": "pending",
+              "operations": [
+                {
+                  "path": "createBusinessAccount / listBusinessAccounts / getBusinessAccount",
+                  "technical": "Create or read the team account. The creator becomes its owner."
+                },
+                {
+                  "path": "createWalletForBusinessAccount / addWalletToBusinessAccount",
+                  "technical": "Create a wallet or link an existing embedded wallet. The caller becomes its first signer."
+                }
+              ],
+              "note": "We can put Dynamic’s wallet methods behind ONE’s shared account experience, with Gateway using the same wallet record as other products. We still need to confirm early-access availability in ONE’s environment before depending on it."
+            },
+            {
+              "id": "dynamic-access",
+              "title": "Access & policies",
+              "summary": "Manage the team and constrain how authorised wallet signers act.",
+              "status": "Early access",
+              "tone": "pending",
+              "operations": [
+                {
+                  "path": "addBusinessAccountMember / updateBusinessAccountMemberRole / removeBusinessAccountMember",
+                  "technical": "Manage administrators and viewers; removing a member also removes their signer records."
+                },
+                {
+                  "path": "addBusinessAccountSigner / removeBusinessAccountSigner",
+                  "technical": "Grant or revoke wallet signing. Adding a signer needs owner/admin authority plus an active signer on that wallet."
+                },
+                {
+                  "path": "checkStepUpAuth + an authentication method",
+                  "technical": "Obtain fresh, action-scoped authentication for sensitive changes."
+                },
+                {
+                  "path": "createPolicy / getPolicy / removePolicyRules",
+                  "technical": "Apply account, wallet and signer rules. All applicable policy layers must pass."
+                }
+              ],
+              "note": "Account administration and wallet signing use separate permissions, with spending policies controlling what an authorised signer can do. Multi-person quorum approvals are still coming soon, so we should leave them out of the current capability claim."
+            }
+          ],
+          "sources": [
+            {
+              "label": "Business Accounts",
+              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/overview"
+            },
+            {
+              "label": "Create / link wallets",
+              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/add-wallets"
+            },
+            {
+              "label": "Wallet policies",
+              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/policies/overview"
+            },
+            {
+              "label": "Signer management",
+              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/manage-signers"
+            },
+            {
+              "label": "Quorum availability",
+              "url": "https://www.dynamic.xyz/docs/javascript/reference/business-accounts/policies/quorum-policies"
+            }
+          ]
         }
       ]
     },
     {
       "id": "integration",
       "number": "04",
-      "nav": "How we integrate",
-      "title": "How we integrate into ONE",
-      "intro": "We should put wallets, payouts and conversion in shared ONE services that Gateway can use.",
+      "nav": "V3 integration",
+      "title": "How Gateway V3 fits into ONE",
+      "intro": "The Flow adapter uses ONE’s existing account and wallet records, while shared business wallets and TMS workflows follow as later platform extensions.",
       "columns": [
         "ONE service",
         "Integration",
@@ -600,96 +599,10 @@ window.SHORTLIST_DATA = {
       ],
       "rows": [
         {
-          "id": "reuse",
-          "title": "Existing ONE APIs",
-          "summary": "Build on the customer, account and payment APIs already documented.",
-          "status": "Reuse",
-          "tone": "neutral",
-          "blocks": [
-            {
-              "label": "Contract",
-              "text": "We can build around the existing /api/v1 calls while preserving their behaviour and who can authorise each movement of funds."
-            },
-            {
-              "label": "Service work",
-              "text": "Where the services need to connect, we can add adapters and map their IDs while keeping Dynamic wallet balances separate from bank balances."
-            }
-          ],
-          "sources": [
-            {
-              "label": "ONE API reference",
-              "url": "https://docs.one.io/"
-            }
-          ]
-        },
-        {
-          "id": "wallet-integration",
-          "title": "Business wallets",
-          "summary": "Add shared business wallets, with optional links from the organisation record.",
-          "status": "New + enhance",
-          "tone": "new",
-          "groups": [
-            {
-              "id": "registry",
-              "title": "Wallet resource",
-              "summary": "Manage business wallets as shared ONE resources, independently of Gateway checkout.",
-              "status": "New endpoints",
-              "tone": "new",
-              "operations": [
-                {
-                  "path": "POST /api/v1/crypto-wallets",
-                  "technical": "Proposed account-service route: register a Dynamic-provisioned wallet after verifying the business relationship."
-                },
-                {
-                  "path": "GET /api/v1/crypto-wallets · GET /api/v1/crypto-wallets/{id}",
-                  "technical": "Proposed: read the merchant’s wallet resources, provider references, addresses and verification state."
-                }
-              ],
-              "blocks": [
-                {
-                  "label": "Namespace",
-                  "text": "We can use /api/v1/crypto-wallets as a working name alongside /api/v1/crypto-custody, or fit wallets into ONE’s account model if that is the better home. Either way, the wallet belongs outside /gateway/ so other products can use it."
-                },
-                {
-                  "label": "Shared account object",
-                  "text": "The wallet record should identify the business, wallet type, provider and signing model, with Gateway, payouts and treasury using the same wallet ID. We should keep wallet and bank balances distinct so the account view remains clear."
-                },
-                {
-                  "label": "Provisioning and authority",
-                  "text": "Onboarding should use Dynamic’s authenticated methods for creating wallets, managing members and granting signing access. The creator becomes the business account owner or first wallet signer as documented, while any ONE or server access needs explicit authority."
-                }
-              ]
-            },
-            {
-              "id": "enrich",
-              "title": "Organisation enhancement",
-              "summary": "Let the current organisation response point to the merchant’s business wallets.",
-              "status": "Parameter + fields",
-              "tone": "new",
-              "operations": [
-                {
-                  "path": "GET /api/v1/organisation?include=businessWallets",
-                  "technical": "Proposed optional parameter; return businessWallets references alongside the existing organisation response."
-                }
-              ],
-              "blocks": [
-                {
-                  "label": "Compatible enhancement",
-                  "text": "Existing callers can keep the same response, while callers requesting businessWallets receive references to separately authorised wallet records without changing their account balances."
-                },
-                {
-                  "label": "Alternative",
-                  "text": "We can also list wallets through GET /api/v1/crypto-wallets alone, if ONE prefers to keep the organisation response as it is."
-                }
-              ]
-            }
-          ]
-        },
-        {
           "id": "collection-integration",
           "title": "Gateway collections",
-          "summary": "Connect each checkout to the merchant’s receiving preferences and a Flow payment.",
-          "status": "New + extend",
+          "summary": "Resolve the merchant default custody or verified self-custody profile and create a Flow attempt.",
+          "status": "SPARK first",
           "tone": "new",
           "groups": [
             {
@@ -779,13 +692,113 @@ window.SHORTLIST_DATA = {
                 }
               ]
             }
+          ],
+          "blocks": [
+            {
+              "label": "Request and destination",
+              "text": "The proposed Gateway V3 payment intent or future crypto-checkout entry point invokes the same attempt service. ONE identifies the merchant, applies its configured default profile, and validates any requested profile override."
+            },
+            {
+              "label": "Flow adapter",
+              "text": "ONE resolves the verified address, asset and network from its own account or wallet records, creates Flow server-side, verifies destination readback, and stores the Flow ID with the intent and attempt."
+            },
+            {
+              "label": "Receipt boundary",
+              "text": "Custody destinations require a matched ONE deposit and ledger credit. Self-custody destinations require on-chain receipt evidence and must not appear as a ONE account credit."
+            }
+          ]
+        },
+        {
+          "id": "reuse",
+          "title": "Existing ONE APIs",
+          "summary": "Build on the customer, account and payment APIs already documented.",
+          "status": "Reuse",
+          "tone": "neutral",
+          "blocks": [
+            {
+              "label": "Contract",
+              "text": "We can build around the existing /api/v1 calls while preserving their behaviour and who can authorise each movement of funds."
+            },
+            {
+              "label": "Service work",
+              "text": "Where the services need to connect, we can add adapters and map their IDs while keeping Dynamic wallet balances separate from bank balances."
+            }
+          ],
+          "sources": [
+            {
+              "label": "ONE API reference",
+              "url": "https://docs.one.io/"
+            }
+          ]
+        },
+        {
+          "id": "wallet-integration",
+          "title": "Business wallets",
+          "summary": "Extend account services with shared business wallets after the Flow demo.",
+          "status": "Later phase",
+          "tone": "new",
+          "groups": [
+            {
+              "id": "registry",
+              "title": "Wallet resource",
+              "summary": "Manage business wallets as shared ONE resources, independently of Gateway checkout.",
+              "status": "New endpoints",
+              "tone": "new",
+              "operations": [
+                {
+                  "path": "POST /api/v1/crypto-wallets",
+                  "technical": "Proposed account-service route: register a Dynamic-provisioned wallet after verifying the business relationship."
+                },
+                {
+                  "path": "GET /api/v1/crypto-wallets · GET /api/v1/crypto-wallets/{id}",
+                  "technical": "Proposed: read the merchant’s wallet resources, provider references, addresses and verification state."
+                }
+              ],
+              "blocks": [
+                {
+                  "label": "Namespace",
+                  "text": "We can use /api/v1/crypto-wallets as a working name alongside /api/v1/crypto-custody, or fit wallets into ONE’s account model if that is the better home. Either way, the wallet belongs outside /gateway/ so other products can use it."
+                },
+                {
+                  "label": "Shared account object",
+                  "text": "The wallet record should identify the business, wallet type, provider and signing model, with Gateway, payouts and treasury using the same wallet ID. We should keep wallet and bank balances distinct so the account view remains clear."
+                },
+                {
+                  "label": "Provisioning and authority",
+                  "text": "Onboarding should use Dynamic’s authenticated methods for creating wallets, managing members and granting signing access. The creator becomes the business account owner or first wallet signer as documented, while any ONE or server access needs explicit authority."
+                }
+              ]
+            },
+            {
+              "id": "enrich",
+              "title": "Organisation enhancement",
+              "summary": "Let the current organisation response point to the merchant’s business wallets.",
+              "status": "Parameter + fields",
+              "tone": "new",
+              "operations": [
+                {
+                  "path": "GET /api/v1/organisation?include=businessWallets",
+                  "technical": "Proposed optional parameter; return businessWallets references alongside the existing organisation response."
+                }
+              ],
+              "blocks": [
+                {
+                  "label": "Compatible enhancement",
+                  "text": "Existing callers can keep the same response, while callers requesting businessWallets receive references to separately authorised wallet records without changing their account balances."
+                },
+                {
+                  "label": "Alternative",
+                  "text": "We can also list wallets through GET /api/v1/crypto-wallets alone, if ONE prefers to keep the organisation response as it is."
+                }
+              ]
+            }
           ]
         },
         {
           "id": "payout-integration",
           "title": "Crypto payouts",
-          "summary": "Add crypto batches using ONE custody or an authorised wallet signer.",
-          "status": "New + extend",
+          "summary": "Develop crypto batch payouts as a separate treasury workflow.",
+          "status": "Later phase",
           "tone": "new",
           "groups": [
             {
@@ -859,9 +872,9 @@ window.SHORTLIST_DATA = {
         {
           "id": "offramp-service",
           "title": "Auto-conversion",
-          "summary": "Connect a receiving address to ONE’s deposit, trading and fiat credit services.",
-          "status": "New + extend",
-          "tone": "new",
+          "summary": "On hold while the Flow collection path is worked through.",
+          "status": "On hold",
+          "tone": "pending",
           "blocks": [
             {
               "label": "Account service",

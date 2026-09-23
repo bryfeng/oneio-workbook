@@ -1,36 +1,36 @@
-# Collect a payment through ONE
+# Gateway V3 collection through ONE
 
-**Product specification draft · Existing custody first · 23 September 2026**
+**Product specification draft · Flow first · 23 September 2026**
 
-The merchant creates a payment request in ONE, and the customer pays through ONE’s checkout using their own wallet. ONE supplies the receiving address from its account records, while Flow handles the payment route and reports settlement progress.
+The merchant creates a payment request in ONE, and the customer pays through ONE’s checkout using their own wallet. ONE resolves the merchant’s configured default settlement profile to an eligible custody account or verified self-custody wallet, then Flow handles the payment route and reports settlement progress.
 
 ## The experience
 
-**Create request → Resolve receiving account → Create Flow → Connect payer → Review and pay → Track receipt**
+**Create request → Resolve merchant default → Create Flow → Connect payer → Review and pay → Verify receipt**
 
 | Moment | What the user sees | What happens behind it |
 | --- | --- | --- |
-| Merchant creates a request | Amount, order reference and an enabled receiving account | ONE fixes the payment terms and resolves the receiving address |
+| Merchant creates a request | Amount, order reference and optional settlement profile | ONE applies the merchant default or validates the selected profile and resolves its address |
 | Customer opens checkout | ONE branding, requested amount and a connect-wallet action | ONE starts or resumes a Flow attempt, without requiring a payer address |
 | Customer connects a wallet | Available funding network and token | Checkout attaches the connected wallet to Flow and waits for its risk decision |
 | Customer reviews payment | Amount to send, route, fees and quote expiry | Flow quotes the selected funding asset against the fixed receiving terms |
 | Customer approves payment | Wallet approval, followed by payment progress | The wallet submits the transaction; checkout reports its hash to Flow |
-| Merchant receives an update | Payment submitted, funds delivered, then account credited when confirmed | ONE tracks Flow settlement separately from its custody deposit and ledger credit |
+| Merchant receives an update | Payment submitted, destination received, then custody credit if applicable | ONE tracks Flow settlement separately from custody credit or self-custody receipt |
 
-The payer stays inside ONE’s experience, apart from the normal approval interaction with their connected wallet. Existing custody accounts provide the first receiving destination; business wallets can later use the same Flow sequence through ONE’s account and wallet services.
+The payer stays inside ONE’s experience, apart from the normal approval interaction with their connected wallet. The SPARK path uses existing custody or verified self-custody destinations. Shared business wallets can use the same Flow sequence later through ONE’s account services.
 
 ## Scope and evidence
 
 | Item | Position in this specification |
 | --- | --- |
-| ONE login and crypto-account lookup | Existing API; successful authenticated reads during the local test |
+| ONE login and crypto-account lookup | Existing API; a successful account response supplied the address used in the local test |
 | Flow creation and destination readback | Tested locally: creation returned 201, server read returned 200, and the receiving address matched |
-| ONE payment intents, attempts and settlement profiles | Proposed product contracts, extending the workbook’s existing walkthrough |
+| ONE payment intents, attempts and settlement profiles | Proposed contracts; default resolution supports custody or a verified self-custody record |
 | Payer connection, quote, payment and settlement | Documented provider sequence; not exercised in this test |
 | ONE custody deposit and account credit | Integration still to confirm with ONE; no credit demonstrated |
-| Auto-conversion and crypto batch payouts | Outside this collection experience; auto-conversion remains on hold |
+| Business-wallet provisioning and crypto batch payouts | Later platform work; auto-conversion remains on hold |
 
-The Flow test reused a successful ONE account response captured earlier in the session because the fresh Keychain lookup timed out. It proves that the API-returned address can become Flow’s stored destination, while leaving a fresh uninterrupted run and actual settlement untested.
+The Flow test reused a successful ONE account response captured earlier in the session because the fresh Keychain lookup timed out. It proves that a ONE API-returned custody address can become Flow’s stored destination. The broader design supports a verified self-custody profile, but that resolver, an uninterrupted fresh run and actual settlement remain untested.
 
 ## Example carried through the calls
 
@@ -39,9 +39,9 @@ This worked trace uses the tested receiving configuration, with fictional identi
 | Value | Example | Origin and use |
 | --- | --- | --- |
 | Merchant and order | `DEMO-MERCHANT-001` / `DEMO-ORDER-1042` | Merchant from ONE authentication; order from the merchant request |
-| Existing account | `DEMO-ACCOUNT-001` | `id` from ONE’s account response |
+| Default profile | `DEMO-PROFILE-001` | Merchant configuration resolving to an approved custody account or verified self-custody wallet |
 | Receiving address | `<ONE_EVM_RECEIVING_ADDRESS>` | `cryptoAddresses[].primaryAddress`, copied into Flow’s destination |
-| Settlement profile | `DEMO-PROFILE-001` | Proposed ONE configuration linking the account to an approved receiving asset and network |
+| Resolved resource | `DEMO-ACCOUNT-001` | Profile-backed custody account in this tested example; the same profile model can reference a verified wallet |
 | Intent and attempt | `DEMO-INTENT-1042` / `DEMO-ATTEMPT-1042` | ONE records linking the order to one provider execution attempt |
 | Provider Flow | `<FLOW_ID>` | `flow.id` returned by Dynamic; reused in every later provider path |
 | Amount | `1.00 USD` | Receiver amount fixed at creation, with `pegStablecoins: true` for this test |
@@ -49,15 +49,15 @@ This worked trace uses the tested receiving configuration, with fictional identi
 | Proposed funding asset | Test USDC / Arbitrum Sepolia / `421614` | Selected after wallet connection; contract `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` |
 | Payer | `<CONNECTED_PAYER_ADDRESS>` | Connected wallet address, introduced only after Flow creation |
 
-ONE labelled the test account USDT, while this proof used its EVM address for Base Sepolia test USDC. That address reuse does not establish custody support or credit eligibility; production must validate the account, asset and network together.
+ONE labelled the tested account USDT, while this proof used its EVM address as the Base Sepolia test USDC destination. That address reuse establishes neither asset custody support nor credit eligibility; production must validate each profile, asset and network together.
 
 Current Flow testnet documentation requires a connected wallet and a swap or bridge, so this example sends `disableSwaps: false`. The proposed cross-chain funding route remains untested, and checkout must show the actual quote rather than assuming fees or delivery amounts. [Supported testnet routes](https://www.dynamic.xyz/docs/flow/supported-chains)
 
-## 1. Resolve the receiving account
+## 1. Resolve the merchant default destination
 
-**Actor: ONE backend → ONE account API · Existing contract**
+**Actor: ONE backend → account and wallet records · Existing lookup plus profile resolution to confirm**
 
-The merchant selects an existing receiving account, and ONE resolves its address without requiring a dashboard lookup or pasted wallet address. The integration authenticates on behalf of the authorised merchant; the payer never receives these credentials.
+ONE derives the merchant from API authentication and loads its configured default settlement profile. The profile resolves to an eligible custody account or a verified self-custody wallet; an optional profile ID must belong to the same merchant and pass current asset and network checks. The payer never supplies the merchant’s settlement address.
 
 ```http
 POST https://integration-api.uk-sbx-1.credis.tech/api/v1/auth/token
@@ -97,7 +97,7 @@ X-Partner-Authorization: <ENCRYPTED_USER_CONTEXT>
 ]
 ```
 
-Carry the account ID and selected address into the receiving configuration, retaining the merchant ownership check alongside them. The local proof selected the unique active USDT account with an EVM address; the product must instead resolve the selected account against an approved asset/network mapping.
+Carry the account ID and selected address into the receiving configuration, retaining the merchant ownership check alongside them. The local proof selected an active ONE crypto account with an EVM address. Product resolution must apply the merchant’s active default profile and an approved asset/network mapping; self-custody registry evidence remains to confirm.
 
 The partner header encrypts the configured user’s `user_id`, `email`, `created_date`, `first_name` and `last_name`. Our successful calls used AES-256-GCM and Base64 encoding of nonce, ciphertext and tag, matching ONE’s code sample; its prose names AES-GCM-SIV, so production documentation needs clarification. [ONE authentication and accounts](https://docs.one.io/)
 
@@ -105,7 +105,7 @@ The partner header encrypts the configured user’s `user_id`, `email`, `created
 
 **Actor: merchant → ONE Gateway; checkout → ONE Gateway · Proposed contracts**
 
-The merchant supplies the commercial terms, while ONE derives merchant identity and the receiving destination from authorised records. Extend the proposed settlement profile with `accountId` for existing custody, keeping `walletId` for the later business-wallet path and requiring exactly one receiving resource.
+The merchant supplies commercial terms, while ONE derives identity and the destination from authorised records. The proposed settlement profile references exactly one eligible custody accountId or verified self-custody walletId. A later business wallet can use the same wallet reference without changing the Flow contract.
 
 ```http
 POST /gateway/v3/payment-intents
@@ -319,21 +319,21 @@ Prototype checkout can poll this unauthenticated provider read, while production
 
 For a completed settlement event, carry `data.flowId`, `data.newState` and `data.additionalData.settlementTxHash`, together with destination `chainName` and `chainId`. Verify the provider signature and environment, resolve the saved ONE attempt, and deduplicate repeated or out-of-order events before updating records. [Flow events](https://www.dynamic.xyz/docs/flow/webhooks)
 
-Match the destination transfer to ONE’s custody deposit and existing ledger credit using the account, network, token, destination transaction and transfer identity. The exact custody event fields and credit lookup still need confirmation; this specification does not invent a public credit endpoint.
+For custody profiles, match the destination transfer to ONE’s deposit and existing ledger credit using the account, network, token, destination transaction and transfer identity. For self-custody, verify the configured external wallet’s on-chain receipt and record it separately. Exact event fields and credit lookup still need confirmation; this specification does not invent a public credit endpoint.
 
-ONE can show “Funds delivered” from verified settlement evidence while displaying account credit as pending until its own ledger confirms it. Flow events must never independently create a second credit for a deposit already handled by ONE’s custody process.
+ONE shows verified delivery for either destination type. It shows ONE account credit as pending only for custody profiles until its ledger confirms the credit. Flow events must never independently create a second credit for a deposit already handled by ONE’s custody process.
 
 ## Records and service responsibilities
 
-**Order → ONE intent → ONE attempt → Flow → Destination transfer → Custody deposit → ONE credit**
+**Order → ONE intent → default settlement profile → ONE attempt → Flow → verified custody credit or external-wallet receipt**
 
 | Owner | Records or behaviour to extend |
 | --- | --- |
-| Account / wallet services | Merchant ownership, selected `accountId` or `walletId`, receiving addresses, supported token/network mapping and configuration version |
+| Account / wallet services | Merchant ownership, active default profile, verified accountId or walletId, receiving address, supported token/network mapping and configuration version |
 | Gateway / payment orchestration | Intent, attempt, order reference, amount, currency, expiry, settlement snapshot, checkout access and idempotency |
 | Flow adapter | Server token, environment, provider Flow ID, immutable destination readback and provider errors |
 | ONE checkout | Wallet connection, source attachment, private Flow session token, quote review and wallet approval |
-| Reconciliation | Independent execution/risk/settlement states, source and destination hashes, deposit match, ledger reference and deduplicated event handling |
+| Reconciliation | Independent Flow states, source and destination hashes, plus custody deposit/credit matching or external-wallet receipt and deduplicated event handling |
 
 These are service responsibilities for ONE to map onto its existing implementation, without assuming each responsibility requires a new deployed service. Issuing and restoring checkout access, protecting the one-time Flow session token and preventing duplicate active attempts remain part of the proposed Gateway work.
 
@@ -348,6 +348,7 @@ These are service responsibilities for ONE to map onto its existing implementati
 | Processing delivery | Source confirmed or settlement in progress | Completed delivery or ONE credit |
 | Funds delivered · credit pending | Verified `settlementState: completed` and destination transfer | ONE ledger credit |
 | Account credited | Matched custody deposit and confirmed existing ledger credit | Fiat conversion |
+| External wallet received | Verified settlement to the merchant’s approved self-custody destination | ONE custody or fiat balance |
 | Needs attention | Blocked/review risk, provider failure or unmatched receipt | Refund, cancellation or safe automatic replay |
 | Expired / cancelled | Eligible pre-submission attempt reaches the corresponding provider state | Reversal of any transaction already broadcast |
 
@@ -357,8 +358,8 @@ Keep the provider’s execution, settlement and risk states separately from ONE�
 
 | Scenario | Expected product behaviour |
 | --- | --- |
-| Receiving address changes in ONE | New attempts resolve current approved details; existing attempts retain their original destination snapshot |
-| Missing, ambiguous or unsupported destination | Stop before Flow creation and identify the receiving configuration that needs attention |
+| Default settlement profile changes | New attempts resolve the current approved destination; existing attempts retain their original destination snapshot |
+| Missing, ambiguous, unverified or unsupported destination | Stop before Flow creation and identify the profile or asset/network configuration that needs attention |
 | Payer has not connected | Create the Flow successfully with no payer address or manual receiving-address lookup |
 | Customer connects a wallet | Attach that wallet’s address and selected funding chain; keep the merchant destination unchanged |
 | Readback disagrees with ONE’s saved terms | Prevent payment and preserve the created Flow ID for investigation |
@@ -366,7 +367,7 @@ Keep the provider’s execution, settlement and risk states separately from ONE�
 | Quote expires, balance is insufficient or wallet changes | Refresh or reattach only in an eligible state, then request approval of the resulting terms |
 | Wallet submits but reporting fails | Recover the recorded source hash and provider state before any retry; do not resubmit the payment |
 | Source confirms before settlement | Continue showing delivery in progress until destination settlement is confirmed |
-| Settlement completes before ONE credits | Show delivered with credit pending, then link the existing credit when matched |
+| Settlement completes before ONE credits | For custody, show delivered with credit pending until the existing ledger credit matches; for self-custody, record the external-wallet receipt without claiming a ONE credit |
 | Repeated or delayed webhook | Verify, deduplicate and reconcile state without creating another receipt or ledger credit |
 | Customer reloads checkout | Restore the authorised ONE attempt and provider state; define secure session recovery before claiming resumable payment |
 
@@ -374,9 +375,9 @@ Keep the provider’s execution, settlement and risk states separately from ONE�
 
 | Item | Decision needed from ONE |
 | --- | --- |
-| Supported receiving routes | Authoritative account-to-network/token mapping, including whether any sandbox route supports actual custody credit |
+| Supported receiving routes | Authoritative custody and self-custody records, network/token mapping, wallet verification and Travel Rule handling for each route |
 | Deposit and ledger matching | Existing custody event, unique transfer identity, ledger reference and correction handling |
 | Checkout access and recovery | Intent-scoped access, session-token handling, shared-link behaviour and resume rules |
 | Existing service ownership | Where account resolution, Gateway orchestration, Flow integration and reconciliation fit in the current stack |
 
-The next test adds wallet connection, a valid quote, payer approval and destination settlement to the already verified address handoff. Business wallets then extend the receiving resource under account services, while the checkout and Flow lifecycle remain the same.
+The next test adds payer connection, a valid quote, approval and destination settlement to the verified custody-address handoff. Verify the self-custody resolver separately; business wallets can then extend the account-service profile model without changing the checkout or Flow lifecycle.

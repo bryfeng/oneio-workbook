@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ONE system map — Mark review</title>
+<title>ONE service map — Gateway V3</title>
 <meta name="description" content="ONE service map reconstructed from shared architecture documents, with proposed extension points and follow-up items.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23232e27'/%3E%3Cpath d='M22 9a9 9 0 1 0 0 14' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
@@ -13,8 +13,8 @@
 <a class="skip-link" href="#service-map">Skip to service map</a>
 <main class="system-document">
   <header class="masthead">
-    <div><div class="eyebrow">CLEARER / ONE</div><h1>ONE system map</h1><p class="subtitle">The services ONE has documented and where we can build on them.</p></div>
-    <div class="edition"><span>Review draft</span><a href="./">API brief ↗</a><a href="visuals.html">Visual overview ↗</a><a href="walkthrough.html">API walkthrough ↗</a><a href="flow.html">Flow inside ONE ↗</a></div>
+    <div><div class="eyebrow">CLEARER / ONE</div><h1>ONE service map</h1><p class="subtitle">Shared architecture references and the Flow-first Gateway V3 path.</p></div>
+    <div class="edition"><span>Review draft</span><a href="flow.html">Gateway V3 story ↗</a><a href="./">API inventory ↗</a><a href="visuals.html">Visual map ↗</a></div>
   </header>
   <nav class="view-tabs" aria-label="System map sections">
     <a href="#service-map"><span class="nav-number">01</span>Service map</a>
@@ -52,25 +52,25 @@
   </section>
 
   <section id="extensions" class="system-section" aria-labelledby="extensions-title">
-    <div class="section-heading"><span class="section-number">02</span><div><h2 id="extensions-title">Where we can build on this</h2><p>These are the services we would build around, with the proposed endpoints in the <a href="./#integration">API brief</a>.</p></div><span class="map-tag proposed">Proposed</span></div>
+    <div class="section-heading"><span class="section-number">02</span><div><h2 id="extensions-title">Gateway V3 and what follows</h2><p>The Flow adapter links ONE’s payment request to an approved merchant destination. Broader account and treasury services follow separately.</p></div><span class="map-tag proposed">Proposed</span></div>
     <div class="extension-list">
-      <div class="extension-row"><h3>Business wallets</h3><p><strong>Account / wallet services + Dynamic</strong><span>Give the business a shared wallet record that connects its team and signing permissions, with Gateway using it alongside other products.</span></p></div>
-      <div class="extension-row"><h3>Flow collection</h3><p><strong>Gateway + orchestration + Flow adapter</strong><span>Use Flow for the collection, then check that the funds reached the wallet the merchant selected.</span></p></div>
-      <div class="extension-row"><h3>Crypto batches</h3><p><strong>Payments / disbursements + custody or wallet signer</strong><span>Build on the dashboard’s batch handling if we can, adding crypto checks and tracking each recipient before retrying any payment.</span></p></div>
-      <div class="extension-row"><h3>Auto-conversion</h3><p><strong>Custody + trading + ledger + reconciliation</strong><span>Let the merchant agree the conversion instructions up front, then connect deposit checks, any sweep, the trade and fiat credit.</span></p></div>
+      <div class="extension-row"><h3>Flow collection · SPARK first</h3><p><strong>Gateway + orchestration + Flow adapter</strong><span>Resolve the merchant’s default custody or verified self-custody destination, create Flow, then reconcile custody credit or external-wallet receipt.</span></p></div>
+      <div class="extension-row"><h3>Business wallets · later</h3><p><strong>Account / wallet services + Dynamic</strong><span>Add shared ownership, team access and signer controls under ONE accounts, then expose verified wallet profiles to Gateway.</span></p></div>
+      <div class="extension-row"><h3>Treasury workflows · later</h3><p><strong>Payments, disbursements and TMS services</strong><span>Scope crypto batch payouts, stablecoin card issuance and other treasury capabilities as independent product extensions.</span></p></div>
+      <div class="extension-row"><h3>Auto-conversion · on hold</h3><p><strong>Custody + trading + ledger + reconciliation</strong><span>Keep the earlier address, conversion and fiat-credit concept parked until the collection path is agreed.</span></p></div>
     </div>
   </section>
 
   <section id="mark-review" class="system-section" aria-labelledby="review-title">
     <div class="section-heading"><span class="section-number">03</span><div><h2 id="review-title">Follow-up items</h2><p>We can work through these items together to decide which services to use directly and which parts to mock for the demo.</p></div></div>
     <ol class="review-list">
-      <li><strong>Current services</strong><span>Review which services are live, who owns them and which APIs or events connect them, using a newer map if one is available.</span></li>
-      <li><strong>Accounts and balances</strong><span>Clarify how the wallet service connects to the registry and ledger, including the relationships between businesses, accounts, vaults and addresses.</span></li>
-      <li><strong>Batch payout workflow</strong><span>Walk through the dashboard’s batch service to see what we can reuse for crypto, including approvals, funding and retries.</span></li>
-      <li><strong>Crypto-to-fiat workflow</strong><span>Trace a deposit from arrival through screening, any sweep, trading and fiat credit, noting the events, manual steps and how failures are handled.</span></li>
+      <li><strong>Flow destination resolver</strong><span>Confirm merchant default profiles, custody and self-custody records, supported asset/network routes and ownership proof.</span></li>
+      <li><strong>Travel Rule and compliance</strong><span>Confirm the data, screening and recordkeeping each route requires; these obligations may make a destination ineligible for checkout.</span></li>
+      <li><strong>ONE settlement receipt</strong><span>Confirm how completed custody deposits link to the existing ledger credit and how self-custody receipts are recorded separately.</span></li>
+      <li><strong>Later platform scope</strong><span>Map shared wallets, payout batches and TMS opportunities after the Flow checkout and receipt path is agreed.</span></li>
     </ol>
   </section>
-  <footer><span>clearer.money</span><span>Source review · 21 September 2026</span></footer>
+  <footer><span>clearer.money</span><span>Source review · 23 September 2026</span></footer>
 </main>
 </body>
 </html>

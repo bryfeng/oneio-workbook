@@ -1,72 +1,55 @@
-# ONE.io × Fireblocks Flow — delivery options
+# ONE Gateway V3 — Flow inside ONE
 
-**Working draft · 22 September 2026**
+**Product direction · Mark and Bryan aligned · 23 September 2026**
 
-The SPARK demonstration needs a white-label Flow experience inside ONE, covering payment creation, checkout, progress and receipt. The delivery choice is whether we use ONE’s existing custody accounts first or include business wallets in the initial build.
+The SPARK demonstration puts Flow inside ONE’s branded checkout and resolves each payment to the merchant’s configured default receiving destination. It builds on the settlement choices ONE already has, while the full Gateway V3 and its Treasury Management Service extension remain a separate, longer-term story.
 
-| Option | Conference experience | Main dependency |
+| Delivery stage | What it delivers | Main dependency |
 | --- | --- | --- |
-| **1 · Existing custody first** | ONE checkout powered by Flow, settling into an existing ONE custody account | Receiving-address mapping and deposit-to-credit integration |
-| **2 · Business wallets + Flow** | Business-wallet setup in ONE, followed by the same white-label collection experience | Business identity, wallet provisioning, permissions and recovery |
-
-Both options require ONE’s branding and application integration, with effort estimates dependent on the services already available.
+| **1 · Flow-first SPARK demo** | ONE-branded crypto checkout using an eligible custody or verified self-custody destination | Destination resolution, Flow execution and receipt evidence |
+| **2 · Full Gateway V3 + TMS** | Shared account and wallet services that support checkout, payouts and later treasury workflows | Business wallet ownership, policies, compliance and treasury operations |
 
 ## Common build · White-label Flow inside ONE
 
-**ONE payment request → ONE checkout using Flow → destination wallet → receipt in ONE**
+**ONE payment request → merchant default destination → Flow → ONE checkout → verified receipt**
 
-1. Extend ONE’s request service, or the proposed payment-intent contract, to create a Flow and store its payment reference.
-2. Build wallet connection, payment review, quoting and signing into ONE’s checkout through Dynamic’s SDK or API.
-3. Receive verified Flow updates and connect the destination’s receipt evidence to the original request.
-4. Show progress and receipts inside ONE, handling rejection, expiry, interrupted sessions and wallet handoff.
+1. Extend ONE’s request service, or the proposed payment-intent contract, to load the merchant’s default settlement profile and store the resolved destination with the payment attempt.
+2. Create Flow server-side with the fixed payment terms, supported settlement configuration and verified custody or self-custody address.
+3. Read Flow back and compare its immutable destination with ONE’s saved attempt before returning the checkout reference.
+4. Keep wallet connection, quote review, signing and progress inside ONE’s checkout, then reconcile provider settlement to the correct custody credit or external-wallet receipt.
 
-The working approach is a ONE-controlled frontend using Flow underneath, with creation credentials kept server-side. Dynamic documents self-hosted checkout and hosted custom domains, but a custom domain alone does not establish the required white-label experience inside ONE. Any provider-hosted shortcut needs its branding and integration controls confirmed before entering the plan. [Checkout options](https://www.dynamic.xyz/docs/flow/payment-links)
+The working approach is a ONE-controlled frontend using Flow underneath, with creation credentials kept server-side. Dynamic documents self-hosted checkout and hosted custom domains, but a custom domain alone does not establish the required white-label experience inside ONE. [Checkout options](https://www.dynamic.xyz/docs/flow/payment-links)
 
-The [Flow API outline](2026-09-22-flow-whitelabel-api-outline.md) maps the creation endpoint, parameters and checkout calls to a worked ONE payment example.
+## 1 · Flow-first SPARK demo
 
-## 1 · Existing custody first
+**Gateway V3 or crypto checkout → merchant default → Flow payment → ONE checkout → receipt**
 
-**ONE checkout → Flow → existing ONE custody → merchant receipt in ONE**
+V2 can settle to a manual self-custody wallet or a ONE crypto-custody wallet, but still needs manual trading out. The SPARK demo adds a white-label Fireblocks Flow checkout while keeping those existing destinations.
 
-This delivers the collection experience through ONE while building on its existing custody model.
+For a proposed POST /gateway/v3/payment-intents, ONE identifies the merchant from authentication and resolves its eligible default profile. Any profile override must belong to that merchant and pass status, asset and network checks; it resolves to one custody accountId or verified self-custody walletId. Gateway V3 and a future crypto-checkout entry point use the same attempt service, and the Flow adapter gets the address from ONE’s records, never from the payer.
 
-1. Resolve an eligible custody destination through ONE’s account service, confirming the asset/network and fixing the address for each payment.
-2. Connect that destination to the common Flow build and match the settlement transfer to ONE’s existing deposit record.
-3. Link the existing credit to the merchant receipt, avoiding duplicate credit and preserving held or pending states.
+Custody receipts reconcile against ONE’s deposit and ledger credit; self-custody receipts remain external-wallet receipts. Before checkout exposes a route, ONE confirms its Travel Rule data, screening, recordkeeping and exception handling. Those requirements may rule out a route, and Flow screening does not replace ONE’s obligations.
 
-**ONE dependency:** Receiving-address mapping, access to the inbound deposit/credit process, and integration into its application.
+The sandbox test proved address handoff from ONE’s account API into Flow and server-side readback. Payer approval, on-chain delivery and ONE credit remain untested. See the [collection product specification](flow-experience.html) for the call sequence.
 
-**After SPARK:** Add business-wallet setup beneath accounts or crypto custody, then introduce crypto batch payouts.
+## 2 · Full Gateway V3 + TMS
 
-ONE documents crypto receiving addresses, but the complete asset/network mapping and deposit-to-credit interface still need verification. [ONE API](https://docs.one.io/)
+The broader platform extends ONE account services with shared merchant, custody and wallet records, then lets Gateway, payouts and treasury tools use those records. Dynamic Business Accounts can add team ownership, signers and wallet policies later; they are not needed to launch Flow against existing approved settlement destinations.
 
-## 2 · Business wallets + Flow
+The longer-term Treasury Management Service could add crypto batch payouts, stablecoin card issuance and other treasury workflows. Treat these as separate product opportunities with their own balance, authority, compliance, reconciliation and operating rules. Batch payouts remain later work, and auto-conversion remains on hold.
 
-**ONE business account → wallet setup → ONE checkout → Flow collection into the business wallet**
-
-This brings business-wallet setup into the conference experience, adding ownership and access work to the initial build.
-
-1. Map ONE’s business identity to a Dynamic business account, defining administration, signing and recovery responsibilities.
-2. Add wallet creation or linking under accounts or crypto custody, with the initial members, signers and policies.
-3. Use the verified wallet address in the common Flow build, displaying payment receipt and wallet balance inside ONE.
-
-**ONE dependency:** Business/account integration, wallet permissions and recovery decisions, plus wallet presentation in its application.
-
-**After SPARK:** Extend team controls and crypto batch payouts, with transfers into ONE custody handled separately.
-
-Business-wallet balances remain distinct from ONE custody or bank balances, even when displayed together. Dynamic describes Business Accounts as early access, so access and the control model need confirmation. [Members and roles](https://www.dynamic.xyz/docs/javascript/reference/business-accounts/members-and-roles) · [Policies](https://www.dynamic.xyz/docs/javascript/reference/business-accounts/policies/overview)
+Dynamic’s platform environment and Flow are required to operate the Flow payment. Dynamic embedded wallets are optional for the SPARK demo. Business wallet provisioning and team controls require separate access and ownership decisions.
 
 ## Delivery sequence
 
-Existing custody first is the narrower route to the required ONE experience, with business wallets following afterward. Bringing wallets forward makes sense if wallet setup itself needs to feature at SPARK.
-
-Start with one approved receiving asset/network, then choose a supported funding route for the demonstration. Current Flow testnets require a swap or bridge, while a direct mainnet transfer remains a separate configuration choice. Both need Flow access, approved destinations and verified settlement evidence before we can demonstrate real payments. [Supported chains](https://www.dynamic.xyz/docs/flow/supported-chains) · [Flow events](https://www.dynamic.xyz/docs/flow/webhooks)
-
-| Target | Outcome |
+| Step | Outcome |
 | --- | --- |
-| **2 October** | First real payment proof |
-| **16 October** | Service connections required by the selected option |
-| **30 October** | Complete, rehearsed ONE experience |
-| **2–6 November** | Fixes and rehearsal |
+| Flow foundation | ONE request creates a Flow against one eligible merchant default destination |
+| Checkout | Payer connects, clears screening, receives a current quote and approves in their wallet |
+| Verified receipt | ONE reconciles Flow settlement to a custody credit or external-wallet receipt |
+| Account extension | ONE adds shared business wallets under account services without changing the Flow lifecycle |
+| Treasury extension | ONE scopes batch payouts and other TMS workflows as separate product work |
 
-Choose the wallet sequence and confirm ONE’s interfaces before sizing the build and drafting stories. Crypto batch payouts remain later work, stablecoin-to-fiat auto-conversion stays on hold, and production readiness is assessed separately.
+Before production, ONE needs to confirm its custody and self-custody destination records, supported asset/network mapping, deposit-credit interface, and compliance ownership. Dynamic’s sandbox testnet currently requires a supported swap or bridge route; real payment readiness also depends on Flow access, approved destinations and verified settlement evidence. [Supported chains](https://www.dynamic.xyz/docs/flow/supported-chains) · [Flow events](https://www.dynamic.xyz/docs/flow/webhooks)
+
+ONE’s current public API inventory describes 25 operations. The business-account and checkout extensions here are proposed service contracts, while the Flow methods follow the provider’s published API. [ONE API](https://docs.one.io/) · [Flow API](https://www.dynamic.xyz/docs/flow/api)

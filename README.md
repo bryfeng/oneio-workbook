@@ -1,37 +1,19 @@
-# ONE.io Workbook
+# ONE Gateway V3 workbook
 
-[Open the workbook](https://bryfeng.github.io/oneio-workbook/)
+[Open the Flow-first product story](https://bryfeng.github.io/oneio-workbook/flow.html)
 
-A discussion workbook for ONE.io’s API inventory, business wallets, Fireblocks Flow and crypto batch payouts.
+The product path starts with a white-label Fireblocks Flow checkout inside ONE, using an eligible existing custody account or verified self-custody destination. Shared business wallets and broader Treasury Management Service capabilities follow as separate work.
 
-- [API brief](https://bryfeng.github.io/oneio-workbook/): current inventory, desired functionality, provider capabilities and proposed integration.
-- [Visual overview](https://bryfeng.github.io/oneio-workbook/visuals.html): merchant journeys and service responsibilities.
-- [System map](https://bryfeng.github.io/oneio-workbook/system.html): shared architecture references, proposed extension points and follow-up items.
-- [API walkthrough](https://bryfeng.github.io/oneio-workbook/walkthrough.html): business wallet setup → Fireblocks Flow collection → crypto batch payouts.
-- [LLM-ready Markdown](https://bryfeng.github.io/oneio-workbook/one-api-walkthrough.md): worked parameters, response examples and service handoffs for the development team.
+- [Gateway V3 story](https://bryfeng.github.io/oneio-workbook/flow.html): V2 context, SPARK demo, default destination resolution, API handoff and later platform scope.
+- [Collection product specification](https://bryfeng.github.io/oneio-workbook/flow-experience.html): user journey, API examples, states, evidence and acceptance criteria.
+- [Current API inventory](https://bryfeng.github.io/oneio-workbook/): documented ONE operations, provider capabilities and proposed extensions.
+- [Visual map](https://bryfeng.github.io/oneio-workbook/visuals.html) and [ONE service map](https://bryfeng.github.io/oneio-workbook/system.html): current references and Flow-first service path.
+- [Later wallet and payout example](https://bryfeng.github.io/oneio-workbook/walkthrough.html): a separate follow-on scenario; it does not make business wallets a prerequisite for Flow.
 
-## How to read it
-
-The workbook distinguishes documented provider methods from proposed ONE contracts and illustrative internal handoffs. Example identities, payment amounts and outcomes are fictional. The system map reconstructs shared documents and does not establish current deployed service boundaries. Source links retain their original access permissions.
-
-Auto-conversion is on hold. The walkthrough is a static specification aid and does not invoke payment APIs, connect wallets or move funds.
+The workbook distinguishes published provider methods, tested sandbox evidence, proposed ONE contracts and future platform opportunities. The current test confirmed that an address returned by ONE can be stored as Flow’s destination; payer approval, settlement and ONE credit remain untested. Flow requires Dynamic’s platform environment, while Dynamic embedded business wallets are optional for the first checkout. Auto-conversion remains on hold.
 
 ## Edit and build
 
-Requires Node.js 22 or later, with no package dependencies.
+Requires Node.js 22 or later, with no package dependencies. Edit canonical sources under src/ and run node build.mjs to create public and standalone pages under dist/. The flow-delivery, flow-api and flow-experience Markdown files define the product story, provider calls and collection contract.
 
-```sh
-node build.mjs
-```
-
-Edit the files in `src/`. The build produces six pages, standalone HTML exports and Markdown handoffs in `dist/`. `src/walkthrough-data.mjs` supplies the shared examples used by both the HTML walkthrough and Markdown handoff.
-
-The `flow.html` page covers white-label Flow delivery options, creation parameters, checkout calls and the proposed timeline. Its reviewed sources are `src/flow-delivery.md` and `src/flow-api.md`; `build-flow.mjs` uses those same files for the HTML page and `one-flow-brief.md` download. The standalone export is `one-flow-delivery.html`.
-
-The collection product specification is `flow-experience.html`, linked from the Flow page. Its canonical source is `src/flow-experience.md`, covering the merchant and payer journey, connected API calls, example parameters, service responsibilities, status model and acceptance criteria. The same source produces `one-flow-experience.md` for the development team and `one-flow-experience.html` for standalone review. The live proof stops at Flow creation and receiving-address verification; later checkout and credit stages remain proposed or documented-but-untested.
-
-The standalone files can be opened without a server. Keep the HTML exports and Markdown download together for their companion links.
-
-## Publishing
-
-The GitHub Actions workflow builds and deploys `dist/` to GitHub Pages after a push to `main`, or when manually dispatched. The repository and Pages site are public.
+GitHub Actions builds and deploys dist/ to the public Pages site after a push to main.

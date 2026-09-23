@@ -11,9 +11,9 @@
   }
   const notes = {
     all:'',
-    wallets:'Dynamic creates the wallet, while ONE verifies the business relationship and gives its products a shared wallet reference; the organisation record can optionally link to it.',
-    batches:'ONE checks the batch and tracks each payment against its authorised funding source, using Flow where the payment needs a supported route.',
-    conversion:'ONE follows the merchant’s agreed instructions, checking the deposit, sweeping if needed, executing the trade and crediting the actual fiat proceeds.'
+    wallets:'The SPARK Flow adapter resolves an existing custody or verified self-custody destination from the merchant’s default profile.',
+    batches:'After Flow checkout is established, ONE can add a shared business wallet under account services, with separate ownership and signer controls.',
+    conversion:'Later TMS scope can include crypto batch payouts, stablecoin card issuance and other treasury workflows.'
   };
   document.querySelector('.diagram-controls').addEventListener('click', event => {
     const button = event.target.closest('button[data-focus]');

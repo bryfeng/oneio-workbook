@@ -4,7 +4,7 @@
 
 ONE’s white-label checkout uses Flow’s standard payment API underneath its own screens and branding. The entry point creates the payment; ONE then drives wallet connection, quoting, signing and status through the SDK or HTTP calls below. [Flow API guide](https://www.dynamic.xyz/docs/flow/api)
 
-The [collection product specification](flow-experience.html) connects these calls to ONE’s receiving accounts, user experience, records and acceptance criteria. Its worked testnet trace uses a routed payment; the Base mainnet illustration below remains a separate configuration example.
+The [Gateway V3 product story](flow.html) explains how ONE resolves its default settlement destination before calling Flow. The [collection product specification](flow-experience.html) carries that value through checkout, records and receipt handling.
 
 ## 1. Create the payment from ONE’s backend
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 | `expiresIn` | Integer · optional | Lifetime in seconds; explicitly set `900` in this example |
 | `disableSwaps` | Boolean · optional | `true` restricts quotes to direct transfers; the testnet trace uses `false` for routing |
 
-The shortened `settlements[]` and `destinations[]` rows refer to their parent objects above. ONE resolves the destination from the merchant’s account or business wallet before creating the payment. [Create-flow schema](https://www.dynamic.xyz/docs/api-reference/server/create-a-flow)
+The shortened settlement and destination rows refer to their parent objects above. ONE resolves its merchant-owned default profile to an eligible custody account or verified self-custody wallet before creating the payment. A later business-wallet profile can use the same Flow call. [Create-flow schema](https://www.dynamic.xyz/docs/api-reference/server/create-a-flow)
 
 **Illustrative request — USD invoice, USDC settlement on Base**
 
@@ -69,7 +69,7 @@ The address placeholder makes this an illustration; Base support in ONE’s cust
 
 **Response: HTTP 201, with the created object under `flow`**
 
-ONE stores `flow.id`, the destination snapshot and returned expiry against `DEMO-ATTEMPT-1042`, then opens its checkout with that Flow reference. A new wallet model changes the receiving-address mapping; it does not require a different payment-creation endpoint.
+ONE stores the Flow ID, destination snapshot and expiry against its attempt, then opens checkout with that Flow reference. Custody and verified self-custody profiles use the same Flow create call; later business wallets add another profile-backed destination.
 
 **Other documented controls**
 
@@ -102,11 +102,11 @@ Keep the server bearer token off these SDK routes, because they use the Flow ses
 
 ## 3. Connect settlement to ONE’s receipt
 
-ONE receives `flow.execution.updated`, `flow.settlement.updated` and `flow.risk.updated` through its verified webhook handler, then matches completed settlement evidence to its custody deposit and existing credit using the destination transaction hash and network.
+ONE receives verified execution, settlement and risk events, then matches completed settlement to the destination profile. A custody profile continues through ONE deposit and ledger-credit matching; a self-custody profile records an external-wallet receipt without implying ONE account credit.
 
-**ONE request → ONE attempt → `flow.id` → destination transfer → custody deposit → existing credit / receipt**
+**ONE request → merchant default profile → ONE attempt → Flow → custody credit or external-wallet receipt**
 
-Source confirmation alone does not establish receipt, and a browser return cannot establish merchant credit. If the destination is a business wallet, show its receipt separately from ONE custody or bank balances. [Flow events](https://www.dynamic.xyz/docs/flow/webhooks)
+Source confirmation alone does not establish receipt, and a browser return cannot establish credit. Keep an external self-custody receipt separate from ONE custody and bank balances. [Flow events](https://www.dynamic.xyz/docs/flow/webhooks)
 
 ## Optional: Generate a link to ONE’s checkout
 

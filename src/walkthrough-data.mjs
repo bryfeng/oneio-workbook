@@ -34,12 +34,12 @@ const items = [
 ];
 const transferPlans = items.map((item,i) => ({itemId:item.itemId,attemptId:`DEMO-PAYOUT-ATTEMPT-00${i+1}`,walletId,chainId:asset.chainId,contract:tokenAddress,function:'transfer(address,uint256)',recipient:item.toAddress,amountBaseUnits:['400000000','250000000','150000000'][i]}));
 export default {
-  title:'ONE API walkthrough',
-  date:'21 September 2026',
-  subtitle:'A business wallet, a customer payment, and a batch paid from the same wallet.',
-  intro:'We can use this example to agree how each merchant action becomes an API call and moves through ONE’s services.',
-  premise:'The merchant starts with an empty USDC wallet, receives 1,000 USDC through Flow, then pays three suppliers a total of 800 USDC.',
-  scope:'This is a static example for the development team and their LLM, with proposed contracts and fictional outcomes carried through each step.',
+  title:'Later extension: business wallets and payouts',
+  date:'23 September 2026',
+  subtitle:'An extended scenario after Flow checkout is established.',
+  intro:'This separate example follows a merchant who adds a shared business wallet, then reuses Flow collection and explores a later crypto payout batch.',
+  premise:'The merchant creates a shared USDC wallet, receives 1,000 USDC through Flow, then pays three suppliers a total of 800 USDC.',
+  scope:'This later-stage static example is separate from the SPARK Flow-first demo. It uses proposed service contracts and fictional outcomes for the development team and their LLM.',
   assumptions:[
     ['Example only','DEMO-* identifiers and <ANGLE_BRACKET> values are fictional placeholders, so the requests illustrate the contract without providing runnable payloads.'],
     ['Provider access','Dynamic Business Accounts require early access, and Flow requires enterprise enablement; neither feature is assumed enabled in ONE’s environment.'],
@@ -135,7 +135,7 @@ export default {
     ['Payout services','Confirm whether the dashboard batch service can own crypto jobs, then define the signer handoff, reservation owner, nonce handling and eligible retry action.'],
     ['Registry and reconciliation','Confirm how the Wallet service and Core Registry share records, while keeping observed onchain funds separate from ONE custody and fiat balances.']
   ],
-  llmBrief:'Turn these worked examples into an implementation specification while preserving the sequence, identifiers, money units and authority boundaries. Separate existing documented provider calls from proposed ONE contracts, and map each proposed operation to the service responsibility shown here. Define complete schemas, errors, authentication, idempotency, persistence and state transitions; treat the follow-up items as unresolved inputs rather than inventing existing internal APIs. Include wallet setup, Flow collection, and crypto batch payouts in that order, with auto-conversion excluded. Do not create a runnable mock server as part of this document.',
+  llmBrief:'Use this as a later-stage business-wallet and payout extension to the SPARK Flow-first collection path. Preserve the sequence, identifiers, money units and authority boundaries. Separate documented provider methods from proposed ONE contracts. Define schemas, errors, authentication, idempotency, persistence and state transitions; treat follow-up items as unresolved. Do not make Dynamic Business Accounts a prerequisite for the first Flow checkout, and keep auto-conversion excluded.',
   sources,
   checks:{merchantId,businessAccountId,providerWalletId,walletId,settlementProfileId,intentId,attemptId,flowId,batchId,asset,openingUsdc:'0.000000',receivedUsdc:'1000.000000',payouts:items,closingUsdc:'200.000000'}
 };

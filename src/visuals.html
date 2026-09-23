@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ONE API extensions — Visual overview</title>
+<title>ONE Gateway V3 — Visual map</title>
 <meta name="description" content="ONE APIs, merchant capabilities, Dynamic and Fireblocks Flow, and proposed integration.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23232e27'/%3E%3Cpath d='M22 9a9 9 0 1 0 0 14' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
@@ -15,14 +15,14 @@
 <a class="skip-link" href="#inventory-visual">Skip to diagrams</a>
 <main class="visual-document">
 <header class="masthead">
-  <div><div class="eyebrow">CLEARER / ONE</div><h1>ONE API extensions</h1><p class="subtitle">Visual overview</p></div>
-  <div class="edition"><span>Discussion draft</span><a href="./">API brief ↗</a><a href="system.html">System map ↗</a><a href="walkthrough.html">API walkthrough ↗</a><a href="flow.html">Flow inside ONE ↗</a></div>
+  <div><div class="eyebrow">CLEARER / ONE</div><h1>ONE Gateway V3</h1><p class="subtitle">Visual map · Flow inside ONE first</p></div>
+  <div class="edition"><span>Discussion draft</span><a href="flow.html">Gateway V3 story ↗</a><a href="./">API inventory ↗</a><a href="system.html">Service reference ↗</a></div>
 </header>
 <nav class="view-tabs visual-nav" aria-label="Visual sections">
   <a href="#inventory-visual" aria-current="location"><span class="nav-number">01</span>Current inventory</a>
-  <a href="#journeys-visual"><span class="nav-number">02</span>What we want</a>
+  <a href="#journeys-visual"><span class="nav-number">02</span>V3 product path</a>
   <a href="#providers-visual"><span class="nav-number">03</span>Dynamic & Flow</a>
-  <a href="#integration-visual"><span class="nav-number">04</span>How we integrate</a>
+  <a href="#integration-visual"><span class="nav-number">04</span>V3 integration</a>
 </nav>
 
 <section id="inventory-visual" class="visual-section" aria-labelledby="inventory-title">
@@ -48,20 +48,20 @@
 </section>
 
 <section id="journeys-visual" class="visual-section" aria-labelledby="journeys-title">
-  <div class="section-heading"><span class="section-number">02</span><div><h2 id="journeys-title">What we want to enable</h2></div><span class="evidence-tag proposed-tag">Proposed</span></div>
+  <div class="section-heading"><span class="section-number">02</span><div><h2 id="journeys-title">V3 product path</h2></div><span class="evidence-tag proposed-tag">Proposed</span></div>
   <figure class="figure-surface journey-figure" aria-labelledby="journeys-title journeys-caption">
-    <div class="wallet-foundation"><strong>Business wallets</strong><span>One business wallet with team access and signing controls across collection, payouts and treasury</span></div>
+    <div class="wallet-foundation"><strong>SPARK · Flow inside ONE</strong><span>White-label crypto checkout on an eligible existing ONE custody account or verified self-custody wallet. Shared business wallets follow as a separate account-service extension.</span></div>
     <div class="journey">
       <div class="journey-label"><h3>Crypto collection</h3></div>
       <ol class="journey-steps">
         <li><strong>Payer approves</strong><small>Approval from the funding wallet</small></li>
         <li><strong>Flow routes</strong><small>A supported token and network</small></li>
-        <li><strong>Wallet receives</strong><small>The merchant’s chosen stablecoin</small></li>
+        <li><strong>Merchant destination receives</strong><small>The merchant’s approved destination</small></li>
         <li class="outcome-step"><strong>Verify receipt</strong><small>Delivery, fees and transaction records</small></li>
       </ol>
     </div>
     <div class="journey">
-      <div class="journey-label"><div><h3>Crypto payouts</h3><p>Batch example</p></div></div>
+      <div class="journey-label"><div><h3>Crypto payouts · later</h3><p>Treasury extension</p></div></div>
       <ol class="journey-steps">
         <li><strong>Upload recipients</strong><small>CSV upload or API request</small></li>
         <li><strong>Authorise batch</strong><small>Recipient checks and permission to spend</small></li>
@@ -70,7 +70,7 @@
       </ol>
     </div>
     <div class="journey">
-      <div class="journey-label"><h3>Auto-conversion</h3></div>
+      <div class="journey-label"><h3>Auto-conversion · on hold</h3></div>
       <ol class="journey-steps">
         <li><strong>Activate address</strong><small>Agreed asset, network, fiat and fees</small></li>
         <li><strong>Confirm deposit</strong><small>Receipt and deposit checks at ONE</small></li>
@@ -86,15 +86,15 @@
   <div class="section-heading"><span class="section-number">03</span><div><h2 id="providers-title">What Dynamic & Flow provide</h2></div></div>
   <figure class="figure-surface responsibility-figure" aria-labelledby="providers-title providers-caption">
     <div class="responsibility-grid">
-      <div class="responsibility-column dynamic-role">
-        <div class="role-heading"><h3>Dynamic</h3><span class="evidence-tag early-tag">Early access</span></div>
-        <ul class="responsibilities"><li>Business-owned wallets</li><li>Team members and wallet signers</li><li>Spending policies and step-up authentication</li></ul>
-        <div class="responsibility-boundary"><p>Managing the account and signing a payment require separate permissions, with multi-person quorum approvals still coming soon.</p></div>
-      </div>
       <div class="responsibility-column flow-role">
         <div class="role-heading"><h3>Fireblocks Flow</h3><span class="evidence-tag">Documented</span></div>
         <ul class="responsibilities"><li>Payment requests and links</li><li>Funding, screening and routing</li><li>Delivery tracking and events</li></ul>
-        <div class="responsibility-boundary"><p>We still need to confirm delivery after the source transaction, with ONE handling any subsequent conversion and fiat credit.</p></div>
+        <div class="responsibility-boundary"><p>Confirm delivered custody funds against ONE credit. For self-custody, record an external-wallet receipt; do not imply ONE balance credit.</p></div>
+      </div>
+      <div class="responsibility-column dynamic-role">
+        <div class="role-heading"><h3>Dynamic platform</h3><span class="evidence-tag early-tag">Wallets later</span></div>
+        <ul class="responsibilities"><li>Business-owned wallets</li><li>Team members and wallet signers</li><li>Spending policies and step-up authentication</li></ul>
+        <div class="responsibility-boundary"><p>Flow needs a Dynamic environment. Embedded business wallets are optional for this checkout; team and signer controls are later work.</p></div>
       </div>
     </div>
     <figcaption id="providers-caption">Flow needs a Dynamic environment, while payers can also use supported external wallets. <a href="./#providers">Methods & sources ↗</a></figcaption>
@@ -102,36 +102,36 @@
 </section>
 
 <section id="integration-visual" class="visual-section" aria-labelledby="integration-title">
-  <div class="section-heading"><span class="section-number">04</span><div><h2 id="integration-title">How we integrate into ONE</h2><p>We should build wallets, payouts and conversion as shared services that Gateway can use.</p></div><span class="evidence-tag proposed-tag">Proposed</span></div>
-  <div class="diagram-controls" role="group" aria-label="Highlight a shared service"><button type="button" data-focus="all" aria-pressed="true">All</button><button type="button" data-focus="wallets" aria-pressed="false">Wallets</button><button type="button" data-focus="batches" aria-pressed="false">Payouts</button><button type="button" data-focus="conversion" aria-pressed="false">Auto-conversion</button></div>
+  <div class="section-heading"><span class="section-number">04</span><div><h2 id="integration-title">Gateway V3 integration path</h2><p>Connect the Flow attempt to ONE’s approved default destination first. Add shared wallets and treasury services later.</p></div><span class="evidence-tag proposed-tag">Proposed</span></div>
+  <div class="diagram-controls" role="group" aria-label="Highlight a shared service"><button type="button" data-focus="all" aria-pressed="true">All</button><button type="button" data-focus="wallets" aria-pressed="false">Flow / destination</button><button type="button" data-focus="batches" aria-pressed="false">Business wallets · later</button><button type="button" data-focus="conversion" aria-pressed="false">TMS later</button></div>
   <figure class="figure-surface integration-figure" aria-labelledby="integration-title integration-caption">
     <div class="integration-board" data-active="all">
       <div class="consumer-grid"><div class="consumer-node"><strong>Gateway checkout</strong><small>New collection API · Flow</small></div><div class="consumer-node"><strong>Merchant dashboard</strong></div><div class="consumer-node"><strong>Partner API</strong></div></div>
       <div class="shared-bus"><span>Shared ONE services</span></div>
       <div class="service-grid">
         <div class="service-column" data-service="wallets">
-          <div class="service-node proposed-node"><span class="node-type">Wallet API + account links</span><h3>Business wallets</h3><p>Wallets linked to the business</p></div>
+          <div class="service-node proposed-node"><span class="node-type">Gateway API + Flow adapter</span><h3>Flow collection</h3><p>Existing custody or verified self-custody destination</p></div>
           <div class="dependency-link" aria-hidden="true"></div>
-          <div class="dependency-node"><strong>Dynamic</strong><p>Wallets, signers and spending policies</p><span class="inline-status">Early access</span></div>
+          <div class="dependency-node"><strong>ONE destinations</strong><p>Existing custody or verified self-custody profiles</p><span class="inline-status">SPARK first</span></div>
         </div>
         <div class="service-column" data-service="batches">
-          <div class="service-node proposed-node"><span class="node-type">API + service changes</span><h3>Crypto payouts</h3><p>One batch, with a result for each recipient</p></div>
+          <div class="service-node proposed-node"><span class="node-type">Account service + Dynamic</span><h3>Business wallets · later</h3><p>Shared ownership and signer controls</p></div>
           <div class="dependency-link" aria-hidden="true"></div>
-          <div class="dependency-node"><strong>ONE custody / wallet signer</strong><p>Flow where the payout needs a supported route</p></div>
+          <div class="dependency-node"><strong>Business accounts</strong><p>Shared ownership, signers and wallet policies</p></div>
         </div>
         <div class="service-column" data-service="conversion">
-          <div class="service-node proposed-node"><span class="node-type">API + service changes</span><h3>Auto-conversion</h3><p>A receiving address with agreed conversion instructions</p></div>
+          <div class="service-node proposed-node"><span class="node-type">API + service changes</span><h3>TMS tools · later</h3><p>Crypto batches · stablecoin cards</p></div>
           <div class="dependency-link" aria-hidden="true"></div>
-          <div class="dependency-node"><strong>ONE custody → conversion → ledger</strong><p>ONE’s address, trading and credit APIs to confirm</p></div>
+          <div class="dependency-node"><strong>ONE treasury services</strong><p>Scope batch payouts, stablecoin card issuance and other workflows separately</p></div>
         </div>
       </div>
       <div class="existing-foundation"><strong>Reuse ONE’s customer and financial APIs</strong></div>
     </div>
     <div class="trace-note" id="trace-note" role="status" aria-live="polite" hidden></div>
-    <figcaption id="integration-caption"><a href="./#integration">APIs & service changes ↗</a></figcaption>
+    <figcaption id="integration-caption"><a href="./#integration">API and service details ↗</a></figcaption>
   </figure>
 </section>
-<footer><span>clearer.money</span><span>Sources reviewed 20 September 2026</span></footer>
+<footer><span>clearer.money</span><span>Product direction · 23 September 2026</span></footer>
 </main>
 </body>
 </html>

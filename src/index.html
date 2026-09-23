@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ONE API extensions — API brief</title>
-  <meta name="description" content="Existing ONE APIs, desired merchant capabilities, Dynamic and Fireblocks Flow, and the proposed integration into ONE.">
+  <title>ONE Gateway V3 — API and service inventory</title>
+  <meta name="description" content="ONE Gateway V3 product story, Flow-first checkout, API inventory and later service extensions.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23232e27'/%3E%3Cpath d='M22 9a9 9 0 1 0 0 14' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
   <script src="data.js" defer></script>
@@ -15,8 +15,9 @@
 <main class="api-document">
   <header class="masthead">
     <div><div class="eyebrow" id="eyebrow">CLEARER / ONE</div><h1 id="page-title">ONE API extensions</h1><p class="subtitle" id="subtitle">How we can build on ONE’s accounts, wallets and payment services.</p></div>
-    <div class="edition"><span>Discussion draft</span><a href="visuals.html">Visual overview ↗</a><a href="system.html">System map ↗</a><a href="walkthrough.html">API walkthrough ↗</a><a href="flow.html">Flow inside ONE ↗</a></div>
+    <div class="edition"><span>Discussion draft</span><a href="flow.html">Gateway V3 story ↗</a><a href="visuals.html">Visual map ↗</a><a href="system.html">ONE service reference ↗</a></div>
   </header>
+  <section class="story-callout"><div><span class="story-kicker">PRODUCT DIRECTION · SPARK</span><h2>Flow inside ONE comes first.</h2><p>Build a white-label crypto checkout on the settlement choices ONE already has. Add shared business wallets and treasury workflows in later stages.</p></div><a class="story-link" href="flow.html">Open the Gateway V3 story <span aria-hidden="true">↗</span></a></section>
   <nav class="view-tabs" id="views" aria-label="Document sections"></nav>
   <div class="toolbar">
     <div class="section-label"><span class="reading-note">Open a row for the API details and source docs</span><span id="result-count" role="status" aria-live="polite"></span></div>
@@ -24,7 +25,7 @@
   </div>
   <div id="sections"></div>
   <div id="empty" hidden><strong>No matching capabilities</strong><p>Try a business action, provider or endpoint.</p><button type="button" id="clear-search">Clear search</button></div>
-  <details class="reference-note"><summary>What the demo covers</summary><p>The dashboard and checkout use sample data and local mock APIs, so the merchant journeys remain demonstrations. The separate local test verified ONE’s API-returned receiving address in a created Flow, while payer execution and settlement remain untested. The <a href="flow-experience.html">collection product specification</a> connects that proof to the proposed complete experience.</p></details>
+  <details class="reference-note"><summary>What the demo covers</summary><p>The local sandbox proof passed an address from ONE into Flow and verified the saved destination. Payer execution, settlement and account credit remain untested. Dynamic Flow is required for checkout; embedded business wallets can follow later. See the <a href="flow-experience.html">collection product specification</a>.</p></details>
   <footer><span>clearer.money</span><span>Sources reviewed <span id="footer-date">20 September 2026</span></span></footer>
 </main>
 <noscript><p>This interactive brief needs JavaScript to display its API inventory and expandable notes.</p></noscript>
