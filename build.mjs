@@ -4,6 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { buildWalkthrough } from './build-walkthrough.mjs';
 import { buildFlow } from './build-flow.mjs';
+import { addWorkbookShell } from './workbook-shell.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, 'dist');
@@ -60,4 +61,8 @@ for (const [name, markup] of [['index.html', html], ['visuals.html', visualHtml]
 }
 const walkthrough = await buildWalkthrough(root,dist);
 await buildFlow(root,dist);
-console.log(`Built six workbook pages, including the static walkthrough (${walkthrough.sections} sections, ${walkthrough.steps} steps) and Flow delivery/API and collection specification pages, with standalone HTML and Markdown.`);
+for (const name of ['flow-lab.html', 'flow-lab.css', 'flow-lab.mjs', 'flow-lab-shared.mjs', 'flow-lab-config.mjs']) {
+  await cp(path.join(root, 'src', name), path.join(dist, name));
+}
+await addWorkbookShell(root, dist);
+console.log(`Built seven workbook pages with shared navigation, including Flow Lab and the walkthrough (${walkthrough.sections} sections, ${walkthrough.steps} steps).`);

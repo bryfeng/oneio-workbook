@@ -2,7 +2,7 @@ const navLinks = [...document.querySelectorAll('.view-tabs a')];
 const sections = navLinks.map(link => document.querySelector(link.hash));
 let scheduled = false;
 function updateSection() {
-  const passed = sections.filter(section => section.getBoundingClientRect().top <= 110);
+  const passed = sections.filter(section => section.getBoundingClientRect().top <= Math.max((document.querySelector('.workbook-header')?.offsetHeight || 0) + 90, window.innerHeight / 4));
   const current = passed.at(-1) || sections[0];
   navLinks.forEach(link => {
     if (link.hash === `#${current.id}`) link.setAttribute('aria-current','location');

@@ -87,7 +87,7 @@ export async function buildFlow(root, dist) {
   const controlsMarker = '**Other documented controls**';
   const [required, examples] = parameters.split(exampleMarker);
   const [example, controls] = examples.split(controlsMarker);
-  const apiIntro = a.intro.split('\n\n').find(p=>p.startsWith('ONE’s white-label'));
+  const apiIntro = a.intro.split('\n\n').filter(p=>p.startsWith('ONE’s white-label') || p.startsWith('**Quote lab update')).join('\n\n');
   const markup = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ONE Gateway V3 — Flow inside ONE</title><meta name="description" content="The Gateway V3 product story: a Flow-powered ONE checkout using the merchant’s configured custody or verified self-custody destination."><style>${baseCss}\n${css}</style></head>
 <body><a class="skip-link" href="#delivery">Skip to the V3 story</a><main class="flow-document">

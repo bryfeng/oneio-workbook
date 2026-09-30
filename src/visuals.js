@@ -28,7 +28,7 @@
   });
   const sections = [...document.querySelectorAll('.visual-section')];
   function updateNav() {
-    const reached = sections.filter(s => s.getBoundingClientRect().top <= 160);
+    const reached = sections.filter(s => s.getBoundingClientRect().top <= (document.querySelector('.workbook-header')?.offsetHeight || 0) + 90);
     const atEnd = window.scrollY > 0 && Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 2;
     const current = atEnd ? sections.at(-1) : reached.at(-1) || sections[0];
     document.querySelectorAll('.visual-nav a').forEach(a => {

@@ -6,6 +6,8 @@ ONE’s white-label checkout uses Flow’s standard payment API underneath its o
 
 The [Gateway V3 product story](flow.html) explains how ONE resolves its default settlement destination before calling Flow. The [collection product specification](flow-experience.html) carries that value through checkout, records and receipt handling.
 
+**Quote lab update · 29 September 2026.** The [Flow Lab](flow-lab.html) makes the create, verify, source, quote and cancel requests editable and sendable from the public workbook through its protected quote backend. Connect using the lab access key. Mainnet quote-only testing with a EUR 500 invoice and Base EURC settlement returned roughly 444 EURC; the lab rejects that merchant shortfall. `pegStablecoins: true` did not resolve it. EURC settlement availability is not evidence of exact EUR invoice fulfillment; the provider cause remains unconfirmed. Live amounts are integer base-unit strings and must be decoded using the returned token decimals.
+
 ## 1. Create the payment from ONE’s backend
 
 ```http

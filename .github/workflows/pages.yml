@@ -22,10 +22,12 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: '22'
+      - name: Install build tools
+        run: npm ci
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Build static workbook
-        run: node build.mjs
+        run: npm test
       - name: Upload workbook
         uses: actions/upload-pages-artifact@v4
         with:

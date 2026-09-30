@@ -1,0 +1,19 @@
+{
+  "name": "oneio-workbook",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node build.mjs && node server.mjs",
+    "test": "node build.mjs && npm run worker:check && node --test tests/*.test.mjs",
+    "worker:check": "wrangler deploy --dry-run --config worker/wrangler.jsonc --outdir .local/worker",
+    "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "devDependencies": {
+    "miniflare": "5.20260926.1-alpha",
+    "wrangler": "4.144.0"
+  }
+}

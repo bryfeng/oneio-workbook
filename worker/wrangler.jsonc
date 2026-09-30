@@ -1,0 +1,19 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "oneio-workbook-flow-lab",
+  "main": "index.mjs",
+  "account_id": "162492b8a72fe6a95c8549a774180f05",
+  "compatibility_date": "2026-09-29",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "DYNAMIC_ENVIRONMENT_ID": "3608a494-ff5c-4cbc-a425-ddc382e4a90a",
+    "ALLOWED_ORIGINS": "https://bryfeng.github.io,http://127.0.0.1:4318,http://localhost:4318"
+  },
+  "durable_objects": {"bindings": [{"name":"LAB_SESSIONS","class_name":"FlowLabSession"}]},
+  "migrations": [{"tag":"v1","new_sqlite_classes":["FlowLabSession"]}],
+  "ratelimits": [{"name":"RATE_LIMITER","namespace_id":"2026093001","simple":{"limit":60,"period":60}}],
+  "observability": {"enabled":false},
+  "secrets": {"required":["DYNAMIC_API_TOKEN","LAB_ACCESS_KEY"]}
+}

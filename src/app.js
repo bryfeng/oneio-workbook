@@ -11,7 +11,7 @@
   let query = '';
   function updateCurrentSection() {
     const visible = data.sections.map(s => document.getElementById(s.id)).filter(Boolean);
-    const reached = visible.filter(s => s.getBoundingClientRect().top <= 165);
+    const reached = visible.filter(s => s.getBoundingClientRect().top <= (document.querySelector('.workbook-header')?.offsetHeight || 0) + 90);
     const atEnd = window.scrollY > 0 && Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 2;
     const current = atEnd ? visible.at(-1) : reached.at(-1) || visible[0];
     document.querySelectorAll('#views a').forEach(a => {

@@ -8,3 +8,7 @@ DESIGN.md
 .env.*
 node_modules/
 .openai/
+
+.wrangler/
+.dev.vars*
+.local/

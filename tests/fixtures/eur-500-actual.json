@@ -1,0 +1,30 @@
+{
+  "provenance": {
+    "flowId": "50c6ab61-7d67-4c73-ad3f-e497030832bc",
+    "createdAt": "2026-09-30T00:53:09.614Z",
+    "note": "Actual provider quote reported by user; session and signing data omitted."
+  },
+  "amount": "500",
+  "currency": "EUR",
+  "pegStablecoins": true,
+  "quote": {
+    "fromAmount": "505020435",
+    "toAmount": "444382837",
+    "fromChainId": "8453",
+    "toChainId": "8453",
+    "fromToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "toToken": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+    "fromTokenInfo": {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
+      "decimals": 6
+    },
+    "toTokenInfo": {
+      "name": "EURC",
+      "symbol": "EURC",
+      "logoURI": "https://static.debank.com/image/base_token/logo_url/0x60a3e35cc302bfa44cb288bc5a4f316fdb1adb42/d780f677e5a8c6a28cca43f5a091e8a7.png",
+      "decimals": 6
+    }
+  }
+}
