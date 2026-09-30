@@ -15,5 +15,5 @@
   "migrations": [{"tag":"v1","new_sqlite_classes":["FlowLabSession"]}],
   "ratelimits": [{"name":"RATE_LIMITER","namespace_id":"2026093001","simple":{"limit":60,"period":60}}],
   "observability": {"enabled":false},
-  "secrets": {"required":["DYNAMIC_API_TOKEN","LAB_ACCESS_KEY"]}
+  "secrets": {"required":["DYNAMIC_API_TOKEN","SESSION_SIGNING_KEY"]}
 }

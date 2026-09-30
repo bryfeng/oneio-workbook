@@ -7,10 +7,17 @@ const operations = ['create', 'verify', 'source', 'quote', 'cancel'];
 const form = $('#quote-form');
 const local = ['localhost','127.0.0.1'].includes(location.hostname);
 const apiBase = local ? '' : HOSTED_API;
-let accessSession;
-try { accessSession = JSON.parse(sessionStorage.getItem('oneio-flow-lab-session')); if(accessSession?.expiresAt<=Date.now()) accessSession=undefined; } catch {}
-const apiHeaders = () => ({ 'Content-Type':'application/json', ...(!local && accessSession ? { Authorization:'Bearer '+accessSession.token } : {}) });
-const apiRequest = payload => fetch(apiBase+'/api/request', {method:'POST',headers:apiHeaders(),body:JSON.stringify({...payload,requestId:crypto.randomUUID()})});
+let browserSession;
+try { browserSession = JSON.parse(sessionStorage.getItem('oneio-flow-lab-session')); if(browserSession?.expiresAt<=Date.now()) browserSession=undefined; } catch {}
+const apiHeaders = () => ({ 'Content-Type':'application/json', ...(!local && browserSession ? { Authorization:'Bearer '+browserSession.token } : {}) });
+const apiRequest = async payload => {
+  if (!local && (!browserSession || browserSession.expiresAt <= Date.now())) await readConfig();
+  return fetch(apiBase+'/api/request', {method:'POST',headers:apiHeaders(),body:JSON.stringify({...payload,requestId:crypto.randomUUID()})});
+};
+function saveSession(session) {
+  browserSession=session;
+  try { if(session) sessionStorage.setItem('oneio-flow-lab-session',JSON.stringify(session)); else sessionStorage.removeItem('oneio-flow-lab-session'); } catch {}
+}
 
 let config = { environmentId: '<ENVIRONMENT_ID>', connected: false };
 let drafts = [], selected = 0, activeTab = 'body', context, running = false, history = [], resultDrafts, shownRecord, resultTab = 'response';
@@ -93,7 +100,7 @@ async function send(sequence) {
   try {
     const response = await apiRequest({ contextId: context?.contextId, requests, sequence });
     const result = await response.json();
-    if(response.status===401) { accessSession=undefined; sessionStorage.removeItem('oneio-flow-lab-session'); config.connected=false; renderConnection(); }
+    if(response.status===401) { saveSession(undefined); config.connected=false; renderConnection(); }
     if (sequence && result.context?.contextId !== context?.contextId) history = [];
     history.push(...(result.calls || []));
     if (result.context) context = result.context;
@@ -139,38 +146,23 @@ window.addEventListener('pagehide', () => {
   if (context?.contextId && context.state !== 'cancelled') fetch(apiBase+'/api/request', {method:'POST',headers:apiHeaders(),body:JSON.stringify({contextId:context.contextId,close:true,requestId:crypto.randomUUID()}),keepalive:true}).catch(()=>{});
 });
 function renderConnection() {
-  $('#access-panel').hidden=local;
-  $('#access-form').hidden=config.connected;
-  $('#access-connected').hidden=!config.connected;
-  $('#connection').textContent=config.connected ? '● Live API connected' : local ? 'Local API key needed' : 'Access key required';
-  $('#environment-label').textContent=config.environmentId ? `Environment ${config.environmentId}` : 'Protected quote backend';
-  if(config.connected && accessSession) $('#access-expiry').textContent='Connected until '+new Date(accessSession.expiresAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  $('#connection').textContent=config.connected ? '● Live API connected' : local ? 'Local API key needed' : 'Backend unavailable';
+  $('#environment-label').textContent=config.environmentId ? `Environment ${config.environmentId}` : 'Quote backend';
 }
 async function readConfig() {
   const response=await fetch(apiBase+'/api/config',{headers:apiHeaders()});
   const data=await response.json(); if(!response.ok) throw Error(data.error || 'The backend is unavailable.');
+  if(!local && !data.connected) {
+    const connection=await fetch(apiBase+'/api/session',{method:'POST'});
+    const session=await connection.json(); if(!connection.ok) throw Error(session.error || 'Could not connect.');
+    saveSession(session);
+    data.connected=true;
+  }
   config=data;
   renderConnection();
 }
-$('#access-form').addEventListener('submit',async e=>{
-  e.preventDefault(); $('#connect-api').disabled=true; $('#access-message').hidden=true;
-  try {
-    const key=$('#access-key').value.trim();
-    const response=await fetch(apiBase+'/api/login',{method:'POST',headers:{'X-Flow-Lab-Key':key}});
-    const data=await response.json(); if(!response.ok) throw Error(data.error || 'Could not connect.');
-    accessSession=data; sessionStorage.setItem('oneio-flow-lab-session',JSON.stringify(data)); $('#access-key').value='';
-    context=undefined; await readConfig(); lock(false); message('Connected. Edit a request and send it, or run the full quote sequence.');
-  } catch(error) { $('#access-message').textContent=error.message; $('#access-message').hidden=false; }
-  finally { $('#connect-api').disabled=false; }
-});
-$('#disconnect-api').addEventListener('click',async ()=>{
-  if(running) return;
-  if(context?.contextId && context.state!=='cancelled') {
-    try { const r=await apiRequest({contextId:context.contextId,close:true}); const result=await r.json(); if(result.error || (result.context?.flowId && result.context.cleanup?.status!=='cancelled')) {message(result.error || result.context.cleanup.message,true);return;} } catch {message('Could not confirm cancellation. Try again before disconnecting.',true);return;}
-  }
-  accessSession=undefined; context=undefined; sessionStorage.removeItem('oneio-flow-lab-session'); config.connected=false; renderConnection();lock(false);message('Disconnected. Your editable requests remain on this page.');
-});
+let connectionError;
 try { await readConfig(); }
-catch { $('#connection').textContent='Backend unavailable'; $('#access-panel').hidden=local; }
+catch(error) { connectionError=error.message; $('#connection').textContent='Backend unavailable'; }
 loadParameters(); lock(false);
-if (!config.connected) message(local ? 'Configure the local server credential to send requests.' : 'Connect with your lab access key to send live requests from this page.');
+if (!config.connected) message(connectionError || (local ? 'Configure the local server credential to send requests.' : 'Could not connect. Reload the page to try again.'),true);
