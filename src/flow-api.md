@@ -6,7 +6,7 @@ ONE’s white-label checkout uses Flow’s standard payment API underneath its o
 
 The [Gateway V3 product story](flow.html) explains how ONE resolves its default settlement destination before calling Flow. The [collection product specification](flow-experience.html) carries that value through checkout, records and receipt handling.
 
-**Quote lab update · 29 September 2026.** The [Flow Lab](flow-lab.html) makes the create, verify, source, quote and cancel requests editable and sendable from the public workbook through its protected quote backend. Anyone with the workbook link can send quotes; the page connects automatically without an access key. Mainnet quote-only testing with a EUR 500 invoice and Base EURC settlement returned roughly 444 EURC; the lab rejects that merchant shortfall. `pegStablecoins: true` did not resolve it. EURC settlement availability is not evidence of exact EUR invoice fulfillment; the provider cause remains unconfirmed. Live amounts are integer base-unit strings and must be decoded using the returned token decimals.
+**Quote lab update · 29 September 2026.** The [Flow Lab](flow-lab.html) makes the create, verify, source, quote and cancel requests editable and sendable from the public workbook through its protected quote backend. Anyone with the workbook link can send quotes; the page connects automatically without an access key. Mainnet quote-only testing with a EUR 500 invoice and Base EURC settlement returned roughly 444 EURC; the invoice check flags that merchant shortfall, while the white-label preview remains interactive. Successful checkout quotes stay open for repricing and source changes; the explicit five-request diagnostic sequence still cancels at its final step. `pegStablecoins: true` did not resolve it. EURC settlement availability is not evidence of exact EUR invoice fulfillment; the provider cause remains unconfirmed. Live amounts are integer base-unit strings and must be decoded using the returned token decimals.
 
 ## 1. Create the payment from ONE’s backend
 
@@ -112,6 +112,6 @@ Source confirmation alone does not establish receipt, and a browser return canno
 
 ## Optional: Generate a link to ONE’s checkout
 
-For shareable payment links, `POST /server/{environmentId}/payment-links` accepts the same creation fields plus required `baseUrl`. Set it to ONE’s actual checkout URL, with its origin registered in Dynamic; the response adds `paymentUrl` alongside `flow`.
+For shareable payment links, `POST /server/{environmentId}/payment-links` accepts the same creation fields plus required `baseUrl`. For ONE’s white-label checkout, set it to ONE’s actual checkout URL, with its origin registered in Dynamic; the response adds `paymentUrl` alongside `flow`. Dynamic also documents `https://pay.dynamicauth.com` as a hosted alternative.
 
 ONE’s page reads the `flow` query parameter and drives the same checkout sequence above. This endpoint generates the link; ONE still supplies the white-label checkout interface and receipt integration. [Payment links](https://www.dynamic.xyz/docs/flow/payment-links)

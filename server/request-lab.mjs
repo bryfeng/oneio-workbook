@@ -16,7 +16,7 @@ export function createRequestLab({ environment, token, fetcher = fetch, initialC
     if (object(value)) return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, /^(authorization|sessionToken|x-dynamic-flow-session-token|signature|signingPayload|calldata)$/i.test(key) ? '<SERVER_HELD_SECRET>' : redact(item)]));
     return typeof value === 'string' ? [...secrets].filter(Boolean).reduce((s, secret) => s.replaceAll(secret, '<REDACTED>'), value).replace(/\b(?:dyn_|dft_)[A-Za-z0-9_.-]+/g, '<REDACTED>') : value;
   }
-  const snapshot = c => redact({ contextId: c.id, flowId: c.flowId, verified: c.verified, state: c.state, expiresAt: c.expiresAt, addresses: c.addresses, invoice: c.invoice, quote: c.quote, display: c.display, invoiceCheck: c.invoiceCheck, cleanup: c.cleanup });
+  const snapshot = c => redact({ contextId: c.id, flowId: c.flowId, verified: c.verified, state: c.state, expiresAt: c.expiresAt, addresses: c.addresses, source: c.source, invoice: c.invoice, quote: c.quote, display: c.display, invoiceCheck: c.invoiceCheck, cleanup: c.cleanup });
   function resolve(value, c, preflight = false) {
     const vars = { environmentId: environment, flowId: c.flowId || (preflight ? '11111111-1111-4111-8111-111111111111' : undefined), sourceAddress: c.addresses.source, destinationAddress: c.addresses.destination };
     if (typeof value === 'string') return value.replace(/\{\{(\w+)\}\}/g, (_, key) => { if (!vars[key]) throw Error(`No ${key} yet. Send the preceding requests first.`); return vars[key]; });
@@ -63,7 +63,7 @@ export function createRequestLab({ environment, token, fetcher = fetch, initialC
     const headers = { Accept: 'application/json', ...(r.body ? { 'Content-Type': 'application/json' } : {}) };
     for (const [k, v] of Object.entries(r.headers)) if (!/^(authorization|x-dynamic-flow-session-token)$/i.test(k)) headers[k] = v;
     if (['create', 'verify'].includes(r.operation)) headers.Authorization = `Bearer ${token}`;
-    if (['quote', 'cancel'].includes(r.operation)) headers['X-Dynamic-Flow-Session-Token'] = c.session;
+    if (['quote', 'cancel'].includes(r.operation) || (r.operation === 'source' && c.session)) headers['X-Dynamic-Flow-Session-Token'] = c.session;
     const record = { label: r.operation, method: r.method, url: r.url, headers: redact(headers), body: r.body, startedAt: new Date().toISOString() };
     calls.push(record);
     const started = Date.now();
@@ -86,11 +86,12 @@ export function createRequestLab({ environment, token, fetcher = fetch, initialC
         const keys = ['currency', 'settlementConfig', 'destinationConfig'];
         const flagsMatch = ['pegStablecoins', 'disableSwaps'].filter(k => k in c.invoice).every(k => (flow[k] ?? false) === c.invoice[k]);
         if (normalizeAmount(flow.amount) !== normalizeAmount(c.invoice.amount) || keys.some(k => !matchesRequested(flow[k], c.invoice[k])) || !flagsMatch) throw Error('The saved invoice or settlement differs from the create request.');
-        c.verified = true; c.state = 'verified';
+        c.verified = true; if (['created', 'verified'].includes(c.state)) c.state = 'verified';
       }
       if (r.operation === 'source') {
-        if (!data.sessionToken) throw Error('Source attachment returned no session token.');
-        c.session = data.sessionToken; c.state = 'source-attached';
+        if (!data.sessionToken && !c.session) throw Error('Source attachment returned no session token.');
+        c.session = data.sessionToken || c.session; c.source = r.body; c.state = 'source-attached';
+        c.quote = undefined; c.display = undefined; c.invoiceCheck = undefined;
         c.cleanup = { status: 'pending', message: 'Quote or Cancel will close this preview. Leaving the page also requests cancellation.' };
       }
       if (r.operation === 'quote') {
@@ -100,6 +101,7 @@ export function createRequestLab({ environment, token, fetcher = fetch, initialC
         const target = settlements.find(s => String(s.chainId) === String(c.quote.toChainId) && s.tokenAddress?.toLowerCase() === c.quote.toToken?.toLowerCase());
         c.invoiceCheck = target ? checkInvoiceAmount({ amount: String(c.invoice.amount), currency: c.invoice.currency, settlementChainId: String(target.chainId), settlementTokenAddress: target.tokenAddress }, c.quote) : { status: 'rejected', message: 'Returned settlement does not match any requested asset and network.' };
         c.state = 'quoted';
+        c.cleanup = { status: 'pending', message: 'Checkout is open for quote review. Close the preview to cancel.' };
       }
       if (r.operation === 'cancel') {
         if (flow.executionState !== 'cancelled') throw Error('Provider did not confirm cancellation.');
@@ -116,8 +118,9 @@ export function createRequestLab({ environment, token, fetcher = fetch, initialC
     try { await send({ method: 'POST', url: `${API}/sdk/${environment}/flow/${c.flowId}/cancel`, body: {} }, c, calls); }
     catch (error) { c.cleanup = { status: 'unconfirmed', message: redact(error.message) }; }
   }
-  async function execute({ contextId, requests, sequence = false, close = false }) {
+  async function execute({ contextId, requests, sequence = false, close = false, keepOpen = false }) {
     if (!uuid.test(environment || '') || !token) throw Error('Configure the server with the Dynamic environment ID and API token.');
+    if (typeof keepOpen !== 'boolean' || (keepOpen && sequence)) throw Error('keepOpen is available only for individual checkout requests.');
     let c = contextId && contexts.get(contextId);
     if (contextId && !c && !sequence && !close) throw Error('The lab session was cleared or the server restarted. Start a new sequence.');
     const calls = [];
@@ -139,7 +142,7 @@ export function createRequestLab({ environment, token, fetcher = fetch, initialC
     let error;
     try { for (const request of requests) await send(request, c, calls); }
     catch (e) { error = redact(e.message); if (!c.flowId) c.cleanup = { status: 'unknown', message: 'Creation may have reached the provider; no usable Flow ID was returned. No payment was prepared.' }; }
-    finally { if (sequence || operations.includes('quote') || error) await cleanup(c, calls); await checkpoint(); }
+    finally { if (error || (!keepOpen && (sequence || operations.includes('quote')))) await cleanup(c, calls); await checkpoint(); }
     return { ...(error ? { error } : {}), context: snapshot(c), calls: redact(calls) };
   }
   return { execute };

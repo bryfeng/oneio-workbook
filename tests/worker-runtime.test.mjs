@@ -33,8 +33,10 @@ test('real Worker runtime starts a public session, restores a session after rest
   r=await send('/api/request',{requestId:crypto.randomUUID(),contextId,requests:[requests()[1]]},{Authorization:'Bearer '+other.token});
   assert.equal(r.status,400);assert.match((await r.json()).error,/session was cleared/);assert.equal(seen.length,1);
   await mf.dispose();mf=new Miniflare(convertV4MiniflareOptions(options));
-  for(const step of requests().slice(1,4)){r=await send('/api/request',{requestId:crypto.randomUUID(),contextId,requests:[step]},headers);assert.equal(r.status,200);result=await r.json();assert.equal(result.error,undefined);}
-  assert.equal(result.context.cleanup.status,'cancelled');assert.equal(result.context.invoiceCheck.status,'rejected');assert.equal(seen.length,5);assert.ok(!JSON.stringify(result).includes('runtime-flow-secret'));
-  const id=crypto.randomUUID();r=await send('/api/request',{requestId:id,contextId,close:true},headers);assert.equal(r.status,200);r=await send('/api/request',{requestId:id,contextId,close:true},headers);assert.equal(r.status,409);
+  for(const step of requests().slice(1,4)){r=await send('/api/request',{requestId:crypto.randomUUID(),contextId,requests:[step],keepOpen:true},headers);assert.equal(r.status,200);result=await r.json();assert.equal(result.error,undefined);}
+  assert.equal(result.context.state,'quoted');assert.equal(result.context.invoiceCheck.status,'rejected');assert.equal(seen.length,4);assert.ok(!JSON.stringify(result).includes('runtime-flow-secret'));
+  await mf.dispose();mf=new Miniflare(convertV4MiniflareOptions(options));
+  r=await send('/api/request',{requestId:crypto.randomUUID(),contextId,requests:[requests()[3]],keepOpen:true},headers);result=await r.json();assert.equal(result.context.state,'quoted');assert.equal(seen.length,5);
+  const id=crypto.randomUUID();r=await send('/api/request',{requestId:id,contextId,close:true},headers);assert.equal(r.status,200);assert.equal((await r.json()).context.state,'cancelled');assert.equal(seen.length,6);r=await send('/api/request',{requestId:id,contextId,close:true},headers);assert.equal(r.status,409);
  } finally {await mf.dispose();await rm(disk,{recursive:true,force:true});}
 });

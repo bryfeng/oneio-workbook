@@ -9,14 +9,14 @@ const token = 'private-api-token', session = 'private-session-token';
 const fixture = JSON.parse(readFileSync(new URL('./fixtures/eur-500-actual.json', import.meta.url), 'utf8'));
 const requests = () => previewCalls(DEFAULTS, environment).map(c => JSON.parse(JSON.stringify(c).replaceAll('<FLOW_ID>', '{{flowId}}').replaceAll('<GENERATED_SOURCE_ADDRESS>', '{{sourceAddress}}').replaceAll('<GENERATED_DESTINATION_ADDRESS>', '{{destinationAddress}}')));
 function setup(options = {}) {
-  const seen = []; let invoice;
+  const seen = []; let invoice, sourceCount=0;
   const lab = createRequestLab({ environment, token, fetcher: async (url, init) => {
     const body = init.body ? JSON.parse(init.body) : undefined;
     seen.push({ url, ...init, body });
     let status = 200, data;
     if (url.endsWith('/payment')) { invoice = structuredClone(body); data = { flow: { id } }; status = 201; }
     else if (init.method === 'GET') { data = structuredClone(invoice); data.settlementConfig.settlements[0].isNative = false; if (data.disableSwaps === false) delete data.disableSwaps; if (options.mismatch) data.amount = '1'; }
-    else if (url.endsWith('/source')) data = { sessionToken: session };
+    else if (url.endsWith('/source')) data = options.sourceTokenOnce && sourceCount++ > 0 ? {} : { sessionToken: session };
     else if (url.endsWith('/quote')) { data = { quote: options.quote || fixture.quote, echoed: { token, session } }; if (options.quoteFails) { status = 422; data.message = `No route: ${session}`; } }
     else if (url.endsWith('/cancel')) { data = { executionState: 'cancelled' }; if (options.cancelFails) status = 500; }
     else throw Error('Unexpected request');
@@ -100,4 +100,26 @@ test('closing a manually attached session cancels it', async () => {
   const { lab } = setup(); let contextId;
   for (const request of requests().slice(0, 3)) { const out = await lab.execute({ contextId, requests: [request] }); contextId = out.context.contextId; }
   const out = await lab.execute({ contextId, close: true }); assert.equal(out.context.state, 'cancelled');
+});
+
+test('interactive checkout retains a shortfall quote, reprices and closes explicitly', async () => {
+  const { lab, seen } = setup(); let contextId, out;
+  for (const request of requests().slice(0,4)) {out=await lab.execute({contextId,requests:[request],keepOpen:true});contextId=out.context.contextId;assert.equal(out.error,undefined);}
+  assert.equal(out.context.state,'quoted');assert.equal(out.context.invoiceCheck.status,'rejected');assert.equal(seen.length,4);
+  assert.equal(out.context.cleanup.status,'pending');
+  out=await lab.execute({contextId,requests:[requests()[3]],keepOpen:true});assert.equal(out.context.state,'quoted');assert.equal(seen.length,5);
+  out=await lab.execute({contextId,close:true});assert.equal(out.context.state,'cancelled');assert.equal(seen.length,6);
+});
+test('source changes reuse the private session token and clear the previous quote', async () => {
+  const { lab, seen } = setup({sourceTokenOnce:true});let contextId,out;
+  for (const request of requests().slice(0,4)) {out=await lab.execute({contextId,requests:[request],keepOpen:true});contextId=out.context.contextId;}
+  const source=requests()[2];source.body.fromAddress='0x'+'2'.repeat(40);
+  out=await lab.execute({contextId,requests:[source],keepOpen:true});
+  assert.equal(out.error,undefined);assert.equal(seen.at(-1).headers['X-Dynamic-Flow-Session-Token'],session);assert.equal(out.context.source.fromAddress,source.body.fromAddress);assert.equal(out.context.quote,undefined);
+  await lab.execute({contextId,close:true});
+});
+test('failed interactive quote still closes the Flow and preserves the provider error', async () => {
+  const {lab}=setup({quoteFails:true});let contextId,out;
+  for(const request of requests().slice(0,4)){out=await lab.execute({contextId,requests:[request],keepOpen:true});contextId=out.context.contextId;}
+  assert.match(out.error,/422/);assert.equal(out.context.state,'cancelled');
 });

@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flow Lab — ONE workbook</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="flow-lab.css"><script type="module" src="flow-lab.mjs?v=public-sessions"></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flow Lab — ONE workbook</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="flow-lab.css?v=interactive-checkout"><script type="module" src="flow-lab.mjs?v=interactive-checkout"></script></head>
 <body><a class="skip-link" href="#request-workspace">Skip to request editor</a><main class="lab-document">
 <header class="masthead"><div><div class="eyebrow">LIVE API WORKSPACE</div><h1>Flow Lab</h1><p class="subtitle">Shape a checkout request. Inspect the response. See what the payer sees.</p></div><div class="edition"><span id="connection">Connecting…</span><span>Mainnet · quote only</span></div></header>
-<div class="lab-note"><span>01 — 05</span><p>Create → verify → attach source → quote → cancel. Run the sequence or send an individual request. Every quote is cancelled after pricing returns.</p><a href="https://www.dynamic.xyz/docs/flow/api" target="_blank" rel="noreferrer">API reference ↗</a></div>
+<div class="lab-note"><span>01 — 05</span><p>Try the white-label checkout with live Flow pricing, or edit the API requests below. The checkout stays open while you explore.</p><a href="https://www.dynamic.xyz/docs/flow/api" target="_blank" rel="noreferrer">API reference ↗</a></div>
 <details class="parameter-box" id="parameters"><summary>Invoice parameters <span id="parameter-summary">500 EUR · USDC → EURC on Base</span><span class="expand-mark">+</span></summary>
 <form id="quote-form"><div class="parameter-grid">
 <label>Invoice amount<input name="amount" id="amount" value="500.00" inputmode="decimal" required></label>
@@ -16,6 +16,7 @@
 <label class="wide">Payer address · optional<input name="sourceAddress" placeholder="Generate a synthetic address" spellcheck="false"></label>
 <label class="wide">Destination address · optional<input name="destinationAddress" placeholder="Generate a synthetic address" spellcheck="false"></label>
 </div><div class="parameter-actions"><label class="checkbox"><input type="checkbox" name="pegStablecoins" checked>Peg stablecoins</label><label class="checkbox"><input type="checkbox" name="disableSwaps">Disable swaps</label><button type="submit" class="secondary" id="apply-parameters">Apply to requests</button></div><p class="help">Applying parameters replaces all five request drafts. Blank addresses use synthetic EVM addresses. You can add or change other fields directly in the JSON below.</p></form></details>
+<section class="payer-section" id="checkout-preview" aria-labelledby="payer-title"><div class="payer-heading"><div><div class="eyebrow">PAYER EXPERIENCE</div><h2 id="payer-title">Checkout preview</h2></div><a href="#request-workspace">Edit API requests ↓</a></div><div id="result-region" aria-live="polite"></div></section>
 <section id="request-workspace" class="request-workspace" aria-label="API request workspace">
 <div class="workspace-toolbar"><h2>Requests <span id="draft-status">Editable collection</span></h2><div><button class="secondary" id="new-session">New session</button><button class="primary" id="run-sequence">Run quote sequence <span>↗</span></button></div></div>
 <div class="request-layout"><nav id="request-list" aria-label="Flow requests"></nav><div class="editor">
@@ -26,6 +27,6 @@
 <div class="workspace-bottom"><span id="session-state">No Flow created</span><span id="environment-label">Server credentials stay private</span></div>
 <div id="message" role="status" hidden></div>
 </section>
-<section class="payer-section" aria-labelledby="payer-title"><div class="payer-heading"><div><div class="eyebrow">RETURNED QUOTE</div><h2 id="payer-title">Checkout preview</h2></div><span>Actual amounts · no payment submitted</span></div><div id="result-region" aria-live="polite"><div class="empty-preview"><strong>Your quote will appear here.</strong><p>Run the sequence to compare the requested invoice with the merchant’s quoted delivery.</p><span>USDC → EURC</span></div></div></section>
+
 <footer><span>clearer.money · Flow exploration inside the ONE workbook</span><span>Five quote operations · no payment preparation or signing</span></footer>
 </main></body></html>
